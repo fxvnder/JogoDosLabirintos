@@ -9,21 +9,30 @@
 ;|                   2020139811                     |
 ;\--------------------------------------------------/
 
+; ---------------------------------------------------------
+; |!!!!!!!!!!!!!!!!! TP TAC - VARIANTE 2 !!!!!!!!!!!!!!!!!|
+; ---------------------------------------------------------
+
 ; START
 
 .8086
 .model small
 .stack 2048
 
+; ---------------------------------------------------------
+
 ; DADOS E VARIAVEIS A USAR
 
-dseg	segment para public 'data'
+; ---------------------------------------------------------
+
+dseg	segment para public 'data' ; segmento de codigo "D"
 
         UserInputMenu   dw  ?
 
 		; MENU INICIAL
 
-        MenuOptions db "                    **************************************",13,10
+        MenuOptions db "                                                          ",13,10
+					db "                    **************************************",13,10
 					db "                    *                                    *",13,10
 					db "                    *                                    *",13,10
 					db "                    *   ISEC - Trabalho Pratico de TAC   *",13,10
@@ -41,9 +50,10 @@ dseg	segment para public 'data'
 					
 		; MENU AJUDA
 
-        Ajuda       db "                    **************************************",13,10
+        Ajuda       db "                                                          ",13,10
+					db "                    **************************************",13,10
 					db "                    *                                    *",13,10
-					db "                    *   Ajuda                            *",13,10
+					db "                    *                Ajuda               *",13,10
 					db "                    *                                    *",13,10
 					db "                    *   Neste jogo seras colocado num    *",13,10
 					db "                    *  labirinto. No labirinto, teras de *",13,10
@@ -54,7 +64,7 @@ dseg	segment para public 'data'
 					db "                    *  com base no tempo em que          *",13,10
 					db "                    *  demoraste a completar os niveis.  *",13,10
                     db "                    *                                    *",13,10
-                    db "                    *   Boa sorte!                       *",13,10
+                    db "                    *  Boa sorte!                        *",13,10
 					db "                    *                                    *",13,10
 					db "                    **************************************",13,10
 					db "                                                          ",13,10
@@ -79,7 +89,9 @@ dseg	segment para public 'data'
 		; PALAVRAS
 
 		String_num 		db 		"  0 $"
-        String_nome  	db	    "ISEC  $"	
+        String_Fich1  	db	    "ISEC  $"	
+		String_Fich2  	db	    "ISEC  $"	
+		String_Fich3  	db	    "ISEC  $"	
 		Construir_nome	db	    "            $"	
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
@@ -124,13 +136,15 @@ dseg	segment para public 'data'
 		msgErrorWrite	db	"Ocorreu um erro na escrita para ficheiro!$"
 		msgErrorClose	db	"Ocorreu um erro no fecho do ficheiro!$"
 		
-dseg	ends
+dseg	ends ; fim do segmento "D"
 
+cseg	segment para public 'code' ; segmento "C" comeca
 
-cseg	segment para public 'code'
 assume		cs:cseg, ds:dseg
 
-goto_xy	macro		POSx,POSy
+; macro para manusear posicoes no ecra "X,Y"
+
+goto_xy	macro	POSx,POSy
 		mov		ah,02h
 		mov		bh,0		; numero da pagina
 		mov		dl,POSx
@@ -142,19 +156,32 @@ endm
 
 MOSTRA MACRO STR 
 
-MOV AH,09H
+	MOV AH,09H
 
-LEA DX,STR 
+	LEA DX,STR 
 
-INT 21H
+	INT 21H
 
 ENDM
 
-; FIM DAS MACROS
+; PROCEDIMENTO PARA LER UMA TECLA	
+
+LE_TECLA	PROC
+		
+		mov		ah,08h
+		int		21h
+		mov		ah,0
+		cmp		al,0
+		jne		SAI_TECLA
+		mov		ah, 08h
+		int		21h
+		mov		ah,1
+SAI_TECLA:	RET
+LE_TECLA	endp
 
 
+; PROCEDIMENTO PARA APAGAR ECRA
 
-; ROTINA PARA APAGAR ECRA
 
 apaga_ecra	proc
 			mov		ax,0B800h
@@ -171,9 +198,18 @@ apaga:		mov		byte ptr es:[bx],' '
 apaga_ecra	endp
 
 
-; IMP_FICH - ABRE E IMPRIME FICHEIRO
 
-IMP_FICH	PROC
+; -------------------------------------------
+; 			  CODIGO DOS NIVEIS
+; -------------------------------------------
+
+; -------------------------------------------
+
+; -------------------------------------------
+; IMP_FICH1 - ABRE E GERE FICHEIRO DO NIVEL 1
+; -------------------------------------------
+
+IMP_FICH1	PROC
 
 		;abre ficheiro
         mov     ah,3dh
@@ -215,33 +251,181 @@ fecha_ficheiro:
         mov     bx,HandleFich
         int     21h
         jnc     sai_f
+        mov     ah,09h
+        lea     dx,Erro_Close
+        Int     21h
+
+imprime_palavra:				;por concluir
+		goto_xy 22,11
+		mov     ah,09h
+        lea     dx,String_Fich1
+        int     21h
+        jnc     sai_f
+
+sai_f:	
+		RET
+		
+IMP_FICH1	endp		
+
+; -------------------------------------------
+; IMP_FICH2 - ABRE E GERE FICHEIRO DO NIVEL 2
+; -------------------------------------------
+
+IMP_FICH2	PROC
+
+		;abre ficheiro
+        mov     ah,3dh
+        mov     al,0
+		; FICHEIRO = LABIRINTO 2
+        lea     dx,Fich2
+        int     21h
+        jc      erro_abrir
+        mov     HandleFich,ax
+        jmp     ler_ciclo
+
+erro_abrir:
+        mov     ah,09h
+        lea     dx,Erro_Open
+        int     21h
+        jmp     sai_f
+
+ler_ciclo:
+        mov     ah,3fh
+        mov     bx,HandleFich
+        mov     cx,1
+        lea     dx,car_fich
+        int     21h
+		jc		erro_ler
+		cmp		ax,0		;EOF?
+		je		fecha_ficheiro
+        mov     ah,02h
+		mov		dl,car_fich
+		int		21h
+		jmp		ler_ciclo
+
+erro_ler:
+        mov     ah,09h
+        lea     dx,Erro_Ler_Msg
+        int     21h
+
+fecha_ficheiro:
+        mov     ah,3eh
+        mov     bx,HandleFich
+        int     21h
+        jnc     sai_f
 
         mov     ah,09h
         lea     dx,Erro_Close
         Int     21h
+
+imprime_palavra:				;por concluir
+		goto_xy 22,11
+		mov     ah,09h
+        lea     dx,String_Fich2
+        int     21h
+        jnc     sai_f
+
 sai_f:	
 		RET
 		
-IMP_FICH	endp		
+IMP_FICH2	endp		
 
-; LE UMA TECLA	
+; -------------------------------------------
+; IMP_FICH3 - ABRE E GERE FICHEIRO DO NIVEL 3
+; -------------------------------------------
 
-LE_TECLA	PROC
+IMP_FICH3	PROC
+
+		;abre ficheiro
+        mov     ah,3dh
+        mov     al,0
+		; FICHEIRO = LABIRINTO 3
+        lea     dx,Fich3
+        int     21h
+        jc      erro_abrir
+        mov     HandleFich,ax
+        jmp     ler_ciclo
+
+erro_abrir:
+        mov     ah,09h
+        lea     dx,Erro_Open
+        int     21h
+        jmp     sai_f
+
+ler_ciclo:
+        mov     ah,3fh
+        mov     bx,HandleFich
+        mov     cx,1
+        lea     dx,car_fich
+        int     21h
+		jc		erro_ler
+		cmp		ax,0		;EOF?
+		je		fecha_ficheiro
+        mov     ah,02h
+		mov		dl,car_fich
+		int		21h
+		jmp		ler_ciclo
+
+erro_ler:
+        mov     ah,09h
+        lea     dx,Erro_Ler_Msg
+        int     21h
+
+fecha_ficheiro:
+        mov     ah,3eh
+        mov     bx,HandleFich
+        int     21h
+        jnc     sai_f
+
+        mov     ah,09h
+        lea     dx,Erro_Close
+        Int     21h
+
+imprime_palavra:				;por concluir
+		goto_xy 22,11
+		mov     ah,09h
+        lea     dx,String_Fich3
+        int     21h
+        jnc     sai_f
+
+sai_f:	
+		RET
 		
-		mov		ah,08h
-		int		21h
-		mov		ah,0
-		cmp		al,0
-		jne		SAI_TECLA
-		mov		ah, 08h
-		int		21h
-		mov		ah,1
-SAI_TECLA:	RET
-LE_TECLA	endp
+IMP_FICH3	endp		
 
+; ---------------------------------------------------------
+; ---------------------------------------------------------
+; ---------------------------------------------------------
 
-; Avatar
+PALAVRA_A_COMPLETAR1 PROC
+	; Palavra a procurar
+	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 1
+	mov     ah, 09h
+	lea     dx, String_Fich1
+	int		21H	
+PALAVRA_A_COMPLETAR1 ENDP
 
+PALAVRA_A_COMPLETAR2 PROC
+	; Palavra a procurar
+	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
+	mov     ah, 09h
+	lea     dx, String_Fich1
+	int		21H	
+PALAVRA_A_COMPLETAR2 ENDP
+
+PALAVRA_A_COMPLETAR3 PROC
+	; Palavra a procurar
+	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
+	mov     ah, 09h
+	lea     dx, String_Fich1
+	int		21H	
+PALAVRA_A_COMPLETAR3 ENDP
+
+; ---------------------------------------------------------
+
+; PROCEDIMENTO QUE GERE O AVATAR
+
+; ---------------------------------------------------------
 
 AVATAR	PROC
 
@@ -269,7 +453,8 @@ AVATAR	PROC
 			mov		Car, al			; Guarda o Caracter que esta na posicao do Cursor
 			mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor
 		
-			goto_xy	78,0			; Mostra o caractr que estava na posicao do AVATAR
+			; Imprime caracter onde o avatar se encontra
+			goto_xy	78,0			; Mostra o caracter que estava na posicao do AVATAR
 			mov		ah, 02h			; IMPRIME caracter da posicao no canto
 			mov		dl, Car	
 			int		21H			
@@ -333,11 +518,11 @@ AVATAR		endp
 
 
 
-;########################################################################
+; -------------------------------------------
 
-; Criar ficheiro
+; PROCEDIMENTO DO TOP 10
 
-; TOP 10
+; -------------------------------------------
 
 TOP10	PROC
 
@@ -387,10 +572,11 @@ TOP10	PROC
         
 TOP10	endp
 
+; -------------------------------------------
 
-;########################################################################
+; PROCEDIMENTO DO JOGO
 
-; PROC. JOGO
+; -------------------------------------------
 
 JOGAR   PROC
 
@@ -398,7 +584,37 @@ JOGAR   PROC
 
 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
 
-    call		IMP_FICH    ; procedimento que imprime o conteudo do ficheiro
+    call		IMP_FICH1    ; procedimento que imprime o conteudo do ficheiro
+	
+	call		PALAVRA_A_COMPLETAR1
+
+	call 		AVATAR      ; procedimento do avatar
+
+    goto_xy		0,22        ; x = 0; y = 22
+	
+	mov			ah,4CH 		; FIM DO PROGRAMA
+    
+	INT			21H
+
+JOGAR ENDP
+
+
+; -------------------------------------------
+
+; PROCEDIMENTO DO NIVEL 2
+
+; -------------------------------------------
+
+
+NIVEL2   PROC
+
+	call		apaga_ecra  ; apaga o ecra
+
+	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
+
+    call		IMP_FICH2   ; procedimento que imprime o conteudo do ficheiro
+	
+	call		PALAVRA_A_COMPLETAR2
 
 	call 		AVATAR      ; procedimento do avatar
 
@@ -408,54 +624,88 @@ JOGAR   PROC
 	
     INT			21H
 
+NIVEL2 ENDP
 
-JOGAR ENDP
+
+; -------------------------------------------
+
+; PROCEDIMENTO DO NIVEL 3
+
+; -------------------------------------------
 
 
-;########################################################################
+NIVEL3   PROC
+
+	call		apaga_ecra  ; apaga o ecra
+
+	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
+
+    call		IMP_FICH3   ; procedimento que imprime o conteudo do ficheiro
+	
+	call		PALAVRA_A_COMPLETAR3
+
+	call 		AVATAR      ; procedimento do avatar
+
+    goto_xy		0,22        ; x = 0; y = 22
+		
+	mov			ah,4CH
+	
+    INT			21H
+
+NIVEL3 ENDP
+
+
+; -------------------------------------------
 
 ; PROC. INSTRUCOES
 
-INSTRUCOES   PROC
+; -------------------------------------------
 
-	goto_xy   0,0
+
+INSTRUCOES	PROC
+
+	goto_xy		0,0
     ;call        apaga_ecra
     lea         dx, Ajuda ; mostra a ajuda
     mov         ah, 9
     INT			21H
 	ret
 
-INSTRUCOES ENDP
+INSTRUCOES	ENDP
 
 
-; 177 = ASCII CODE DAS BORDAS DO LABIRINTO
-
-; MOSTRA O MENU
-
+; IMPRIME O MENU INICIAL
 MostraMenu proc
-  goto_xy   0,0
-  lea  dx,  MenuOptions
-  mov  ah,  9
-  int  21h
-  ret
+
+	goto_xy   0,0
+	lea  dx,  MenuOptions
+	mov  ah,  9
+	int  21h
+	ret
+	
 MostraMenu endp
 
 
+; TRATA DO MENU DO PROGRAMA
 MenuInicial proc
 
 	call		apaga_ecra  ; apaga o ecra
+
 	call        MostraMenu ; imprime o menu no ecra
 
 	mov ah, 1h
 	int 21h	
 
-	cmp 	al, 49
+	; chama o procedimento conforme a tecla pressionada
+	cmp 	al, 49 ; 1
 	je		OPCJOGAR
-	cmp		al, 50
+	cmp		al, 50 ; 2
     je		OPCTOP10
-	cmp		al, 51
+	cmp		al, 51 ; 3
     je		OPCINSTRUCOES
-	jmp 	OPCSAIR
+	cmp		al, 52 ; 4
+	je		OPCSAIR
+	jmp     OPCSAIR ; jump -> sair
 	
 OPCJOGAR:
 	
@@ -465,34 +715,22 @@ OPCTOP10:
 
     call    TOP10
 	
-	
 OPCINSTRUCOES:
 
-    call    INSTRUCOES ; imprime a ajuda
+    call    INSTRUCOES 
 	
-OPCSAIR:
-  
-	; sai do programa
-	call	apaga_ecra  ; apaga o ecra
+OPCSAIR:	
 	
 	mov  ax, 4c00h
     int  21h
 
 MenuInicial endp
 
-MovsIniciais proc
+; -------------------------------------------
 
-	mov			ax, dseg
-	mov			ds,ax
-		
-	mov			ax,0B800h
-	mov			es,ax
+; ------------------ MAIN -------------------
 
-MovsIniciais endp
-
-
-; MAIN
-
+; -------------------------------------------
 
 Main  proc
 
@@ -508,23 +746,60 @@ Main  proc
     
 	call		MenuInicial		; trata do programa
 
-Main    endp
-Cseg	ends
+Main    endp ; fim do main
 
-end	Main
+Cseg	ends ; fim do segmento de codigo
 
-; FIM DO PROGRAMA.
-
+end	Main ; fim do programa
 
 
 
-	; CODIGO DE TESTES. IGNORAR.
+
+
+
+
+; ------------------------------------------------------------------
+
+
+; ------------------------ FIM DO PROGRAMA -------------------------
+
+
+; ------------------------------------------------------------------
+
+
+
+
+	; ----------------------------
+	
+	; CODIGO/APONTAMENTOS DE TESTES.
+
+	; ----------------------------
+
+	; !!! 177 = ASCII CODE DAS BORDAS DO LABIRINTO !!!
+
+	; ----------------------------
+
+	; procedimento que servia para resumir o main
+
+
+	; MovsIniciais proc
+
+	; mov			ax, dseg
+	; mov			ds,ax
+		
+	; mov			ax,0B800h
+	; mov			es,ax
+
+	; MovsIniciais endp	
     
+	; -----------------------------
+
     ; codigo para usar o switch nao funcional
     
-    ;push    rbp
-    ;mov     rbp, rsp
-    ;sub     rsp, 16
+
+    ; push    rbp
+    ; mov     rbp, rsp
+    ; sub     rsp, 16
 
     ; call    ReadInt
     ; mov     UserInputMenu, eax
@@ -568,3 +843,5 @@ end	Main
     ;     mov     eax, 0
     ;     leave
     ;     ret
+	;
+	; -----------------------------------
