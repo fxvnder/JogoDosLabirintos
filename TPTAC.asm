@@ -21,6 +21,8 @@ dseg	segment para public 'data'
 
         UserInputMenu   dw  ?
 
+		; MENU INICIAL
+
         MenuOptions db "                    **************************************",13,10
 					db "                    *                                    *",13,10
 					db "                    *                                    *",13,10
@@ -37,6 +39,8 @@ dseg	segment para public 'data'
 					db "                                                          ",13,10
 					db "                                                          ",13,10,'$'
 					
+		; MENU AJUDA
+
         Ajuda       db "                    **************************************",13,10
 					db "                    *                                    *",13,10
 					db "                    *   Ajuda                            *",13,10
@@ -56,10 +60,13 @@ dseg	segment para public 'data'
 					db "                                                          ",13,10
 					db "                                                          ",13,10,'$'
         
+		; VARIAVEIS ETC.
         
 		STR12	 		DB 		"            "	; String para 12 digitos
 		DDMMAAAA 		db		"                     "
 		
+		; CONTADOR
+
 		Horas			dw		0				; Vai guardar a hora atual
 		Minutos			dw		0				; Vai guardar os minutos actuais
 		Segundos		dw		0				; Vai guardar os segundos actuais
@@ -69,21 +76,31 @@ dseg	segment para public 'data'
 		Tempo_limite	dw		100				; tempo maximo de Jogo
 		String_TJ		db		"    /100$"
 
+		; PALAVRAS
+
 		String_num 		db 		"  0 $"
         String_nome  	db	    "ISEC  $"	
 		Construir_nome	db	    "            $"	
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 		
+		; FIM DO JOGO
+
 		Fim_Ganhou		db	    " Ganhou $"	
 		Fim_Perdeu		db	    " Perdeu $"	
+
+		; FICHEIROS
 
         Erro_Open       db      'Erro ao tentar abrir o ficheiro$'
         Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
         Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
-        Fich         	db      'LAB1.TXT',0
+        Fich1         	db      'LAB1.TXT',0
+        Fich2         	db      'LAB2.TXT',0
+        Fich3         	db      'LAB3.TXT',0
         HandleFich      dw      0
         car_fich        db      ?
+
+		; ???
 
 		string			db	"Teste pratico de T.I",0
 		Car				db	32	; Guarda um caracter do Ecra
@@ -92,11 +109,10 @@ dseg	segment para public 'data'
 		POSx			db	3	; POSx pode ir [1..80]	
 		POSya			db	3	; posicao anterior de y
 		POSxa			db	3	; posicao anterior de x
-		
-		
 			
 		; Variáveis da criação de ficheiro
-		fname	db	'top10.txt',0
+		
+		fname	db	'TOP10.TXT',0
 		fhandle dw	0
 		buffer	db	'1 5 6 7 8 9 1 5 7 8 9 2 3 7 8 15 16 18 19 20 3',13,10
 				db 	'+ - / * * + - - + * / * + - - + * / + - - + * ',13,10
@@ -162,7 +178,8 @@ IMP_FICH	PROC
 		;abre ficheiro
         mov     ah,3dh
         mov     al,0
-        lea     dx,Fich
+		; FICHEIRO = LABIRINTO 1
+        lea     dx,Fich1
         int     21h
         jc      erro_abrir
         mov     HandleFich,ax
@@ -424,25 +441,13 @@ MostraMenu proc
 MostraMenu endp
 
 
+MenuInicial proc
 
-; MAIN
-
-
-Main  proc
-
-	mov			ax, dseg
-	mov			ds,ax
-		
-	mov			ax,0B800h
-	mov			es,ax
-	
-    call		apaga_ecra  ; apaga o ecra
-    
-    call        MostraMenu ; imprime o menu no ecra
+	call		apaga_ecra  ; apaga o ecra
+	call        MostraMenu ; imprime o menu no ecra
 
 	mov ah, 1h
 	int 21h	
-
 
 	cmp 	al, 49
 	je		OPCJOGAR
@@ -472,7 +477,48 @@ OPCSAIR:
 	
 	mov  ax, 4c00h
     int  21h
+
+MenuInicial endp
+
+MovsIniciais proc
+
+	mov			ax, dseg
+	mov			ds,ax
+		
+	mov			ax,0B800h
+	mov			es,ax
+
+MovsIniciais endp
+
+
+; MAIN
+
+
+Main  proc
+
+	mov			ax, dseg
+	mov			ds,ax
+		
+	mov			ax,0B800h
+	mov			es,ax
+
+	; call		MovsIniciais	; inicia o programa
+	
+    call		apaga_ecra		; apaga o ecra
     
+	call		MenuInicial		; trata do programa
+
+Main    endp
+Cseg	ends
+
+end	Main
+
+; FIM DO PROGRAMA.
+
+
+
+
+	; CODIGO DE TESTES. IGNORAR.
     
     ; codigo para usar o switch nao funcional
     
@@ -522,12 +568,3 @@ OPCSAIR:
     ;     mov     eax, 0
     ;     leave
     ;     ret
-    ;     
-
-
-
-
-Main    endp
-Cseg	ends
-
-end	Main
