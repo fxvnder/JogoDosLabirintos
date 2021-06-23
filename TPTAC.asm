@@ -88,7 +88,8 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 				db "                    *                                    *",13,10
 				db "                    **************************************",13,10
 				db "                                                          ",13,10
-				db "                                                          ",13,10,'$'
+				db "                                                          ",13,10
+				db "A sua pontuacao final: ",13,10,'$'
 
 	; OUTPUT QUANDO O JOGADOR PERDE
 
@@ -101,7 +102,8 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 				db "                    *                                    *",13,10
 				db "                    **************************************",13,10
 				db "                                                          ",13,10
-				db "                                                          ",13,10,'$'
+				db "                                                          ",13,10
+				db "A sua pontuacao final: ",13,10,'$'
 
 	; TEXTO BEM VINDO
 
@@ -135,9 +137,18 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 	STR10			DB		"          "
 	DDMMAAAA 		db		"                     "
 	
-	; CONTADOR
+	; VARIAVEIS P/ PONTUACAO
 
-	timer			dw 		'0'				; Contador de tempo
+	; cada nivel completado sao x pontos - o tempo demorado
+	PontosLvl1		dw		100
+	PontosLvl2		dw		200
+	PontosLvl3		dw		300
+
+	PontosFinais	dw		0
+
+	; CONTADOR
+ 
+	; timer			dw 		'0'				; Contador de tempo
 	Horas			dw		0				; Vai guardar a hora atual
 	Minutos			dw		0				; Vai guardar os minutos actuais
 	Segundos		dw		0				; Vai guardar os segundos actuais
@@ -564,7 +575,7 @@ AVATAR	PROC
 		mov		ax,0B800h
 		mov		es,ax
 
-		goto_xy	POSx,POSy		; Vai para nova possição
+		goto_xy	POSx,POSy		; Vai para nova posição
 		mov 	ah, 08h			; Guarda o Caracter que está na posição do Cursor
 		mov		bh,0			; numero da página
 		int		10h			
@@ -587,7 +598,12 @@ AVATAR	PROC
 
 	; >>>>>>>>>>>>>>>>>>>> NIVEL 1 <<<<<<<<<<<<<<<<<<<<
 
-ADICIONAR_I:
+	ADICIONAR_I:
+		cmp		progressoC, 49
+		je		SEGUE_I
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_I:
 		goto_xy	10,22
 		MOSTRA	PalavraI
 		goto_xy 38,11 			; Onde está o I no labirinto 1
@@ -600,7 +616,13 @@ ADICIONAR_I:
 		jmp 	Inicio
 
 
+
 	ADICIONAR_IS:
+		cmp		progressoC, 50
+		je		SEGUE_IS
+		jmp		RESETA_PROGRESSO
+		
+	SEGUE_IS:
 		goto_xy	10,22
 		MOSTRA	PalavraIS
 		goto_xy 32,5 			; Onde está o S no labirinto 1
@@ -612,7 +634,14 @@ ADICIONAR_I:
 		mov 	POSy, al
 		jmp 	Inicio
 
+
+
 	ADICIONAR_ISE:
+		cmp		progressoC, 51
+		je		SEGUE_ISE
+		jmp		RESETA_PROGRESSO
+		
+	SEGUE_ISE:
 		goto_xy	10,22
 		MOSTRA	PalavraISE
 		goto_xy 75,17			; Onde está o E no labirinto 1
@@ -624,21 +653,49 @@ ADICIONAR_I:
 		mov 	POSy, al
 		jmp 	Inicio
 
+
+
 	ADICIONAR_ISEC:
+		cmp		progressoC, 52
+		je		SEGUE_ISEC
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_ISEC:
 		goto_xy	10,22
 		MOSTRA	PalavraISEC
 		goto_xy 24,19 			; Onde está o C no labirinto 1
 		MOSTRA	apaga_letra
+
 		mov		progressoC, 53	; ProgressoNaPalavra +1
+
+		; calcula pontuacao
+
+		mov		PontosLvl1, ax
+		sub		ax, Tempo_j
+		mov		PontosFinais, bx
+		add		Tempo_j, bx
+		mov		bx, PontosFinais
+
+		; segue para o nivel seguinte
+
 		mov		al, POSxa	    ; Guarda a posicao do cursor
 		mov		POSx, al
 		mov		al, POSya	    ; Guarda a posicao do cursor
 		mov 	POSy, al
-		call	JOGAR2
+		jmp		JOGAR2
 			
+
+
 	; >>>>>>>>>>>>>>>>>>>> NIVEL 2 <<<<<<<<<<<<<<<<<<<<
 
+
+
 	ADICIONAR_D:
+		cmp		progressoC, 49
+		je		SEGUE_D
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_D:
 		goto_xy	10,22
 		MOSTRA	PalavraD
 		goto_xy 2,6 			; Onde está o D no labirinto 2
@@ -650,7 +707,14 @@ ADICIONAR_I:
 		mov 	POSy, al
 		jmp 	Inicio
 
+
+
 	ADICIONAR_DE:
+		cmp		progressoC, 50
+		je		SEGUE_DE
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_DE:
 		goto_xy	10,22
 		MOSTRA	PalavraDE
 		goto_xy 63,15 			; Onde está o E no labirinto 2
@@ -662,7 +726,14 @@ ADICIONAR_I:
 		mov 	POSy, al
 		jmp 	Inicio
 
-	ADICIONAR_DEI:
+
+
+	ADICIONAR_DEI:		
+		cmp		progressoC, 51
+		je		SEGUE_DEI
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_DEI:
 		goto_xy	10,22
 		MOSTRA	PalavraDEI
 		goto_xy 2,19 			; Onde está o I no labirinto 2
@@ -674,21 +745,49 @@ ADICIONAR_I:
 		mov 	POSy, al
 		jmp 	Inicio
 
+
+
 	ADICIONAR_DEIS:
+		cmp		progressoC, 52
+		je		SEGUE_DEIS
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_DEIS:
 		goto_xy	10,22
 		MOSTRA	PalavraDEIS
 		goto_xy 71,3 			; Onde está o S no labirinto 2
 		MOSTRA	apaga_letra
+
 		mov		progressoC, 53	; ProgressoNaPalavra +1
+		
+		; calcula pontuacao
+
+		mov		PontosLvl2, ax
+		sub		ax, Tempo_j
+		mov		PontosFinais, bx
+		add		Tempo_j, bx
+		mov		bx, PontosFinais
+
+		; segue para o nivel seguinte
+
 		mov		al, POSxa	    ; Guarda a posicao do cursor
 		mov		POSx, al
 		mov		al, POSya	    ; Guarda a posicao do cursor
 		mov 	POSy, al
 		jmp 	JOGAR3
 
+
+
 	; >>>>>>>>>>>>>>>>>>>> NIVEL 3 <<<<<<<<<<<<<<<<<<<<
 
+
+
 	ADICIONAR_T:
+		cmp		progressoC, 49
+		je		SEGUE_T
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_T:
 		goto_xy	10,22
 		MOSTRA	PalavraT
 		goto_xy 45,10 			; Onde está o T no labirinto 3
@@ -700,7 +799,14 @@ ADICIONAR_I:
 		mov 	POSy, al
 		jmp 	Inicio
 
+
+
 	ADICIONAR_TA:
+		cmp		progressoC, 50
+		je		SEGUE_TA
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_TA:
 		goto_xy	10,22
 		MOSTRA	PalavraTA
 		goto_xy 55,17 			; Onde está o A no labirinto 3
@@ -712,24 +818,94 @@ ADICIONAR_I:
 		mov 	POSy, al
 		jmp 	Inicio
 
+
+
 	ADICIONAR_TAC:
+		cmp		progressoC, 51
+		je		SEGUE_TAC
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_TAC:
 		goto_xy	10,22
 		MOSTRA	PalavraTAC
 		goto_xy 10,15 			; Onde está o C no labirinto 3
 		MOSTRA	apaga_letra
+
 		mov		progressoC, 52	; ProgressoNaPalavra +1
+		
+		; calcula pontuacao
+
+		mov		PontosLvl3, ax
+		sub		ax, Tempo_j
+		mov		PontosFinais, bx
+		add		Tempo_j, bx
+		mov		bx, PontosFinais
+
+		; segue para o nivel seguinte
+
 		mov		al, POSxa	    ; Guarda a posicao do cursor
 		mov		POSx, al
 		mov		al, POSya	    ; Guarda a posicao do cursor
 		mov 	POSy, al
 		jmp 	GanhouText
 
+
+
 	; RESETA O PROGRESSO NA PALAVRA
 
+
+
 	RESETA_PROGRESSO:
-		goto_xy 10,22
-		MOSTRA	Construir_nome
-		mov		progressoC, 49	; ProgressoNaPalavra reset
+
+		; ProgressoNaPalavra reset - desnecessário pq os JOGAR dão manage
+		; mov		progressoC, 49	
+
+		
+		; RESET DOS NIVEIS
+
+		; LVL 1
+
+		cmp 	NIVELATUAL, 49 	; LVL 1
+		je		RESETA_LVL1
+
+		; LVL 2
+
+		cmp		NIVELATUAL, 50 	; LVL 2
+		je		RESETA_LVL2	
+
+		; LVL 3
+
+		cmp		NIVELATUAL, 51 	; LVL 3
+		je		RESETA_LVL3
+
+
+	RESETA_LVL1:
+		goto_xy	10,22			
+		MOSTRA	Construir_nome	; RESETA O PROGRESSO
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	JOGAR			; RECOMEÇA O NIVEL
+
+	RESETA_LVL2:
+		goto_xy	10,22
+		MOSTRA	Construir_nome	; RESETA O PROGRESSO
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp		JOGAR2			; RECOMEÇA O NIVEL
+
+	RESETA_LVL3:
+
+		goto_xy	10,22
+		MOSTRA	Construir_nome	; RESETA O PROGRESSO
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp		JOGAR3			; RECOMEÇA O NIVEL
 
 	; CICLO
 
@@ -740,7 +916,7 @@ ADICIONAR_I:
 		mov		dl, Car			; Repoe Caracter guardado 
 		int		21H		
 	
-		goto_xy	POSx,POSy		; Vai para nova possição
+		goto_xy	POSx,POSy		; Vai para nova posição
 
 		mov 	ah, 08h
 		mov		bh,0			; numero da página
@@ -1042,12 +1218,13 @@ JOGAR3	ENDP
 GanhouText PROC
 
 	call	apaga_ecra  ; apaga o ecra	
-	goto_xy		0,5
+	goto_xy	0,5
 	mov		ah, 09h
 	lea		dx, FINALGANHO
+	lea		bx, PontosFinais
 	int		21h
 
-	call		MenuInicial
+	call	MenuInicial
 	ret
 
 GanhouText ENDP
@@ -1062,6 +1239,7 @@ PerdeuText PROC
 	goto_xy	0,5
 	mov		ah, 09h
 	lea		dx, FINALPERDEU
+	lea		bx, PontosFinais
 	int		21h
 
 	call	MenuInicial
@@ -1081,7 +1259,7 @@ PerdeuText ENDP
 INSTRUCOES	PROC
 
 	goto_xy		0,2
-    ;call        apaga_ecra
+    ;call		apaga_ecra
     lea         dx, Ajuda ; mostra a ajuda
     mov         ah, 9
     INT			21H
@@ -1392,133 +1570,132 @@ end		Main 					; fim do programa
 
 
 
+; -------------------------------
 
-	; -------------------------------
+; CODIGO/APONTAMENTOS DE TESTES.
+
+; -------------------------------
+
+; !!! 177 = ASCII CODE DAS BORDAS DO LABIRINTO !!!
+
+; -------------------------------
+
+; procedimento que servia para resumir o main
+
+
+; MovsIniciais proc
+
+; mov			ax, dseg
+; mov			ds,ax
 	
-	; CODIGO/APONTAMENTOS DE TESTES.
+; mov			ax,0B800h
+; mov			es,ax
 
-	; -------------------------------
+; MovsIniciais endp	
 
-	; !!! 177 = ASCII CODE DAS BORDAS DO LABIRINTO !!!
+; -----------------------------
 
-	; -------------------------------
-
-	; procedimento que servia para resumir o main
+; codigo para usar o switch nao funcional
 
 
-	; MovsIniciais proc
+; push    rbp
+; mov     rbp, rsp
+; sub     rsp, 16
 
-	; mov			ax, dseg
-	; mov			ds,ax
-		
-	; mov			ax,0B800h
-	; mov			es,ax
-
-	; MovsIniciais endp	
-    
-	; -----------------------------
-
-    ; codigo para usar o switch nao funcional
-    
-
-    ; push    rbp
-    ; mov     rbp, rsp
-    ; sub     rsp, 16
-
-    ; call    ReadInt
-    ; mov     UserInputMenu, eax
-        
-    ; switch nao funcional.
-    ;     switch:
-    ;     
-    ;         MOV AH, 1   ; le caracter do utilizador
-    ;         INT 21H
-    ;         
-    ;         movsx   eax, BYTE PTR [rbp-1]
-    ;         cmp     eax, 51
-    ;         je      .L5
-    ;         cmp     eax, 51
-    ;         jg      .L6
-    ;         cmp     eax, 49
-    ;         je      .L7
-    ;         cmp     eax, 50
-    ;         je      .L8
-    ;         jmp     switch
-    ; 
-    ; 
-    ; .L7: ; JOGAR
-    ; 
-    ;     mov     eax, 0
-    ;     call    jogar
-    ; 
-    ; .L8: ; TOP 10
-    ; 
-    ;     mov     eax, 0
-    ;     call    TOP10
-    ; 
-    ; .L5: ; SAIR
-    ; 
-    ;     mov     eax, 0
-    ;     leave
-    ;     ret
-    ; 
-    ; .L6: ; SAI DO SWITCH
-    ; 
-    ;     mov     eax, 0
-    ;     leave
-    ;     ret
-	;
-	; -----------------------------------
-
-	; TESTES AVATAR
-
-	; PROCEDIMENTOS PARA AUTOMAÇÃO
-
-	; deteta_letras:	
-	; 		mov SI, TEMPVAR1
-	; 		cmp STRINGSAUTO[SI],32
-	; 		je	fim_pal
-	; 		cmp al,STRINGSAUTO[SI]
-	; 		je ADC_LETRA
-
-	; fim_nivel:
-	; 		mov bx, TEMPVAR4
-	; 		mov TEMPVAR1, bx
-	; 		mov SI, TEMPVAR1
-	; 		mov TEMPVAR1,0
-	; 		lea cx, Construir_nome
-
-	; fim_pal:
-	; 		call NIVEL2	
-	; 		jmp fim_nivel
+; call    ReadInt
+; mov     UserInputMenu, eax
 	
-	; ADC_LETRA:		
-	; 		XOR CX,CX
-	; 		add cx,TEMPVAR3
-	; 		mov TEMPVAR2, cl
+; switch nao funcional.
+;     switch:
+;     
+;         MOV AH, 1   ; le caracter do utilizador
+;         INT 21H
+;         
+;         movsx   eax, BYTE PTR [rbp-1]
+;         cmp     eax, 51
+;         je      .L5
+;         cmp     eax, 51
+;         jg      .L6
+;         cmp     eax, 49
+;         je      .L7
+;         cmp     eax, 50
+;         je      .L8
+;         jmp     switch
+; 
+; 
+; .L7: ; JOGAR
+; 
+;     mov     eax, 0
+;     call    jogar
+; 
+; .L8: ; TOP 10
+; 
+;     mov     eax, 0
+;     call    TOP10
+; 
+; .L5: ; SAIR
+; 
+;     mov     eax, 0
+;     leave
+;     ret
+; 
+; .L6: ; SAI DO SWITCH
+; 
+;     mov     eax, 0
+;     leave
+;     ret
+;
+; -----------------------------------
 
-	; 		lea	cx, Construir_nome
-	; 		mov bx,cx
-	; 		add bx,TEMPVAR3
-	; 		xor bh,bh
+; TESTES AVATAR
 
-	; 		mov [bx],al
-	; 		mov dx, cx
-	; 		mov	ah, 09h	
-	; 		int 21H
+; PROCEDIMENTOS PARA AUTOMAÇÃO
 
-	; 		goto_xy	POSx,POSy
-	; 		jmp ret2
+; deteta_letras:	
+; 		mov SI, TEMPVAR1
+; 		cmp STRINGSAUTO[SI],32
+; 		je	fim_pal
+; 		cmp al,STRINGSAUTO[SI]
+; 		je ADC_LETRA
 
-	; ret2:		
-	; 		inc TEMPVAR1
-	; 		inc TEMPVAR3
-	; 		jmp deteta_letras
-	
+; fim_nivel:
+; 		mov bx, TEMPVAR4
+; 		mov TEMPVAR1, bx
+; 		mov SI, TEMPVAR1
+; 		mov TEMPVAR1,0
+; 		lea cx, Construir_nome
 
-	; -------------------------------------------
-	
-	; CODIGO USADO PARA AUTOMATIZAR PALAVRAS
+; fim_pal:
+; 		call NIVEL2	
+; 		jmp fim_nivel
+
+; ADC_LETRA:		
+; 		XOR CX,CX
+; 		add cx,TEMPVAR3
+; 		mov TEMPVAR2, cl
+
+; 		lea	cx, Construir_nome
+; 		mov bx,cx
+; 		add bx,TEMPVAR3
+; 		xor bh,bh
+
+; 		mov [bx],al
+; 		mov dx, cx
+; 		mov	ah, 09h	
+; 		int 21H
+
+; 		goto_xy	POSx,POSy
+; 		jmp ret2
+
+; ret2:		
+; 		inc TEMPVAR1
+; 		inc TEMPVAR3
+; 		jmp deteta_letras
+
+
+; -------------------------------------------
+
+; CODIGO USADO PARA AUTOMATIZAR PALAVRAS
 
 ; ------------- MODO AUTOMATICO ------------
 
