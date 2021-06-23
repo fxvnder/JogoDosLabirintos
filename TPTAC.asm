@@ -88,8 +88,8 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 				db "                    *                                    *",13,10
 				db "                    **************************************",13,10
 				db "                                                          ",13,10
-				db "                                                          ",13,10
-				db "A sua pontuacao final: ",13,10,'$'
+				db "                                                          ",13,10,'$'
+				;db "A sua pontuacao final: ",13,10,'$'
 
 	; OUTPUT QUANDO O JOGADOR PERDE
 
@@ -97,13 +97,13 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 				db "                    **************************************",13,10
 				db "                    *                                    *",13,10
 				db "                    *                                    *",13,10
-				db "                    *      	    Acabou o tempo!          *",13,10
+				db "                    *           Acabou o tempo!          *",13,10
 				db "                    *                                    *",13,10
 				db "                    *                                    *",13,10
 				db "                    **************************************",13,10
 				db "                                                          ",13,10
-				db "                                                          ",13,10
-				db "A sua pontuacao final: ",13,10,'$'
+				db "                                                          ",13,10,'$'
+				;db "A sua pontuacao final: ",13,10,'$'
 
 	; TEXTO BEM VINDO
 
@@ -254,8 +254,9 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 	NUM_SP		db		"                    $" 	; Para apagar zona de ecra
 
 
-	; testes do café
+	; Apagar letras
 	apaga_letra	db	    " $"
+	
 		
 dseg	ends ; fim do segmento "D"
 
@@ -545,7 +546,7 @@ ler_ciclo4:
 	mov     cx,1
 	lea     dx,car_fich
 	int     21h
-	jc		erro_ler3
+	jc		erro_ler4
 	cmp		ax,0		;EOF?
 	je		fecha_ficheiro4
 	mov     ah,02h
@@ -826,11 +827,11 @@ AVATAR	PROC
 
 		; calcula pontuacao
 
-		mov		PontosLvl1, ax
+		mov		ax, PontosLvl1
 		sub		ax, Tempo_j
-		mov		PontosFinais, bx
-		add		Tempo_j, bx
 		mov		bx, PontosFinais
+		add		ax, bx
+		mov		PontosFinais, ax
 
 		; segue para o nivel seguinte
 
@@ -873,7 +874,7 @@ AVATAR	PROC
 	SEGUE_DE:
 		goto_xy	10,22
 		MOSTRA	PalavraDE
-		goto_xy 63,15 			; Onde está o E no labirinto 2
+		goto_xy 64,15 			; Onde está o E no labirinto 2
 		MOSTRA	apaga_letra
 		mov		progressoC, 51	; ProgressoNaPalavra +1
 		mov		al, POSxa	    ; Guarda a posicao do cursor
@@ -918,11 +919,11 @@ AVATAR	PROC
 		
 		; calcula pontuacao
 
-		mov		PontosLvl2, ax
+		mov		ax, PontosLvl2
 		sub		ax, Tempo_j
-		mov		PontosFinais, bx
-		add		Tempo_j, bx
 		mov		bx, PontosFinais
+		add		ax, bx
+		mov		PontosFinais, ax
 
 		; segue para o nivel seguinte
 
@@ -991,11 +992,11 @@ AVATAR	PROC
 		
 		; calcula pontuacao
 
-		mov		PontosLvl3, ax
+		mov		ax, PontosLvl3
 		sub		ax, Tempo_j
-		mov		PontosFinais, bx
-		add		Tempo_j, bx
 		mov		bx, PontosFinais
+		add		ax, bx
+		mov		PontosFinais, ax
 
 		; segue para o nivel seguinte
 
@@ -1017,8 +1018,8 @@ AVATAR	PROC
 	SEGUE_A:
 		goto_xy	10,22
 		MOSTRA	PalavraA
-		;goto_xy 45,10 			; Onde está o T no labirinto 3
-		;MOSTRA	apaga_letra
+		goto_xy 6,12 			; Onde está o A no labirinto 4
+		MOSTRA	apaga_letra
 		mov		progressoC, 50	; ProgressoNaPalavra +1
 		mov		al, POSxa	    ; Guarda a posicao do cursor
 		mov		POSx, al
@@ -1036,8 +1037,8 @@ AVATAR	PROC
 	SEGUE_AS:
 		goto_xy	10,22
 		MOSTRA	PalavraAS
-		;goto_xy 55,17 			; Onde está o A no labirinto 3
-		;MOSTRA	apaga_letra
+		goto_xy 47,3 			; Onde está o S no labirinto 4
+		MOSTRA	apaga_letra
 		mov		progressoC, 51	; ProgressoNaPalavra +1
 		mov		al, POSxa	    ; Guarda a posicao do cursor
 		mov		POSx, al
@@ -1049,24 +1050,24 @@ AVATAR	PROC
 
 	ADICIONAR_ASM:
 		cmp		progressoC, 51
-		je		SEGUE_TAC
+		je		SEGUE_ASM
 		jmp		RESETA_PROGRESSO
 
 	SEGUE_ASM:
 		goto_xy	10,22
 		MOSTRA	PalavraASM
-		;goto_xy 10,15 			; Onde está o C no labirinto 3
-		;MOSTRA	apaga_letra
+		goto_xy 65,3 			; Onde está o M no labirinto 4
+		MOSTRA	apaga_letra
 
 		mov		progressoC, 52	; ProgressoNaPalavra +1
 		
 		; calcula pontuacao
 
-		mov		PontosLvl4, ax
+		mov		ax, PontosLvl4
 		sub		ax, Tempo_j
-		mov		PontosFinais, bx
-		add		Tempo_j, bx
 		mov		bx, PontosFinais
+		add		ax, bx
+		mov		PontosFinais, ax
 
 		; segue para o nivel seguinte
 
@@ -1075,8 +1076,8 @@ AVATAR	PROC
 		mov		al, POSya	    ; Guarda a posicao do cursor
 		mov 	POSy, al
 		jmp 	JOGAR5
-
-
+		
+		
 	; >>>>>>>>>>>>>>>>>>>> NIVEL 5 <<<<<<<<<<<<<<<<<<<<
 
 
@@ -1088,8 +1089,8 @@ AVATAR	PROC
 	SEGUE_T2:
 		goto_xy	10,22
 		MOSTRA	PalavraT2
-		;goto_xy 45,10 			; Onde está o T no labirinto 3
-		;MOSTRA	apaga_letra
+		goto_xy 3,12 			; Onde está o T no labirinto 5
+		MOSTRA	apaga_letra
 		mov		progressoC, 50	; ProgressoNaPalavra +1
 		mov		al, POSxa	    ; Guarda a posicao do cursor
 		mov		POSx, al
@@ -1107,18 +1108,18 @@ AVATAR	PROC
 	SEGUE_TP:
 		goto_xy	10,22
 		MOSTRA	PalavraTP
-		;goto_xy 10,15 			; Onde está o C no labirinto 3
-		;MOSTRA	apaga_letra
+		goto_xy 64,7 			; Onde está o P no labirinto 5
+		MOSTRA	apaga_letra
 
 		mov		progressoC, 51	; ProgressoNaPalavra +1
 		
 		; calcula pontuacao
 
-		mov		PontosLvl5, ax
+		mov		ax, 500
 		sub		ax, Tempo_j
-		mov		PontosFinais, bx
-		add		Tempo_j, bx
 		mov		bx, PontosFinais
+		add		ax, PontosFinais
+		mov		PontosFinais, ax
 
 		; segue para o nivel seguinte
 
@@ -1127,6 +1128,7 @@ AVATAR	PROC
 		mov		al, POSya	    ; Guarda a posicao do cursor
 		mov 	POSy, al
 		jmp 	GanhouText
+		;jmp	Inicio
 
 
 
@@ -1366,6 +1368,7 @@ AVATAR	PROC
 		jmp		CICLO	
 
 	SAI_PROG:
+		call apaga_ecra
 		mov  ax, 4c00h
 		int  21h
 
@@ -1582,7 +1585,7 @@ GanhouText PROC
 	goto_xy	0,5
 	mov		ah, 09h
 	lea		dx, FINALGANHO
-	lea		bx, PontosFinais
+	;lea	dx, PontosFinais
 	int		21h
 
 	call	MenuInicial
@@ -1600,7 +1603,7 @@ PerdeuText PROC
 	goto_xy	0,5
 	mov		ah, 09h
 	lea		dx, FINALPERDEU
-	lea		bx, PontosFinais
+	;lea	bx, PontosFinais
 	int		21h
 
 	call	MenuInicial
@@ -1707,7 +1710,7 @@ Trata_Horas PROC
 	; QUANDO ACABA O JOGO
 
 	cmp		Tempo_j, 99 ; 99 PORQUE O JOGO COMEÇA NO -1
-	je		tenso
+	;je		tenso
 	
 	; HORAS
 
@@ -1867,8 +1870,8 @@ MenuInicial	proc
 		; switch
 
 		OPCJOGAR:
-			
-			call    JOGAR	
+						
+			call    JOGAR
 			
 		OPCTOP10:
 
