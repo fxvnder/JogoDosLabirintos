@@ -33,196 +33,204 @@ PILHA	ENDS
 
 dseg	segment para public 'data' ; segmento de codigo "D"
 
-		; ----------- MENUS -----------
+	; ----------- MENUS -----------
 
-		; MENU INICIAL
+	; MENU INICIAL
+	
+	MenuOptions db "                                                          ",13,10
+				db "                    **************************************",13,10
+				db "                    *                                    *",13,10
+				db "                    *                                    *",13,10
+				db "                    *   ISEC - Trabalho Pratico de TAC   *",13,10
+				db "                    *                                    *",13,10
+				db "                    *                                    *",13,10
+				db "                    *   1. Jogar                         *",13,10
+				db "                    *   2. Top 10                        *",13,10
+				db "                    *   3. Ajuda                         *",13,10
+				db "                    *   4. Sair                          *",13,10
+				db "                    *                                    *",13,10
+				db "                    *                                    *",13,10
+				db "                    **************************************",13,10
+				db "                                                          ",13,10
+				db "                                                          ",13,10
+				db "                                                          ",13,10,'$'
+				
+	; MENU AJUDA
+
+	Ajuda       db "                                                          ",13,10
+				db "                    **************************************",13,10
+				db "                    *                                    *",13,10
+				db "                    *                Ajuda               *",13,10
+				db "                    *                                    *",13,10
+				db "                    *   Neste jogo seras colocado num    *",13,10
+				db "                    *  labirinto. No labirinto, teras de *",13,10
+				db "                    *  guiar o teu avatar para encontrar *",13,10
+				db "                    *  as letras da palavra pedida.      *",13,10
+				db "                    *   A medida que o fizeres, vais     *",13,10
+				db "                    *  passar de nivel, e seras pontuado *",13,10
+				db "                    *  com base no tempo em que          *",13,10
+				db "                    *  demoraste a completar os niveis.  *",13,10
+				db "                    *                                    *",13,10
+				db "                    *  Boa sorte!                        *",13,10
+				db "                    *                                    *",13,10
+				db "                    **************************************",13,10
+				db "                                                          ",13,10
+				db "                                                          ",13,10,'$'
+
+	; OUTPUT QUANDO O JOGADOR GANHA
+
+	FINALGANHO  db "                                                          ",13,10
+				db "                    **************************************",13,10
+				db "                    *                                    *",13,10
+				db "                    *                                    *",13,10
+				db "                    *          Ganhou - Parabens!        *",13,10
+				db "                    *                                    *",13,10
+				db "                    *                                    *",13,10
+				db "                    **************************************",13,10
+				db "                                                          ",13,10
+				db "                                                          ",13,10,'$'
+
+	; OUTPUT QUANDO O JOGADOR PERDE
+
+	FINALPERDEU db "                                                          ",13,10
+				db "                    **************************************",13,10
+				db "                    *                                    *",13,10
+				db "                    *                                    *",13,10
+				db "                    *      Perdeu - Esgotou o tempo      *",13,10
+				db "                    *                                    *",13,10
+				db "                    *                                    *",13,10
+				db "                    **************************************",13,10
+				db "                                                          ",13,10
+				db "                                                          ",13,10,'$'
+
+	; TEXTO BEM VINDO
+
+	Bem_Vindo	db "Bem-vindo ao Jogo do Labirinto! Have fun ;)",13,10
+				db "Prima qualquer tecla para continuar...!    ",13,10,'$'
+				
+
+	; TEXTO TOP10
+
+	CarrTop10	db "Prima qualquer tecla para voltar ao menu!",13,10
+				db "                                                       	",13,10
+				db "                                                       	",13,10
+				db " Top 10:												",13,10,'$'
+
+	; VARIAVEIS ETC.
+	
+	; VARIAVEIS TEMPORARIAS USADAS PARA TESTES
+
+	; Parede		db		"177" ; deprecated
+	; TEMPVAR1		dw		0
+	; TEMPVAR2		db		0
+	; TEMPVAR3		dw		1
+	; TEMPVAR4		dw		0
+
+	; VARIAVEIS USADAS NO PROGRAMA
+
+	UserInputMenu   dw  	?				; INPUT NO MENU INICIAL
+	NIVELATUAL		dw		0				; NIVEL ATUAL
+	progressoC		dw		0				; PROGRESSO NA PALAVRA
+	STR12	 		DB 		"            "	; String para 12 digitos
+	STR10			DB		"          "
+	DDMMAAAA 		db		"                     "
+	
+	; CONTADOR
+
+	timer			dw 		'0'				; Contador de tempo
+	Horas			dw		0				; Vai guardar a hora atual
+	Minutos			dw		0				; Vai guardar os minutos actuais
+	Segundos		dw		0				; Vai guardar os segundos actuais
+	Old_seg			dw		0				; Guarda os ultimos segundos que foram lidos
+	Tempo_init		dw		0				; Guarda o tempo de inicio do jogo
+	Tempo_j			dw		-1				; Guarda o tempo que decorre o jogo
+	Tempo_limite	dw		100				; tempo maximo de Jogo
+	String_TJ		db		"     / 100$"
+
+	; PALAVRAS
+
+	String_num 		db 		"  0 $"
+
+	; strings manuais p/ficheiro
+
+	String_Inic  	db	    "ISEC  $"	
+	String_Lvl2  	db	    "DEIS  $"	
+	String_Lvl3  	db	    "TAC   $"	
+
+	; strings automaticas - deprecated
+
+	;STRINGCHARS	dw		4
+	;STRINGSAUTO	db		"ISEC  $"
+	;				db		"DEIS  $"
+	;				db		"TAC   $"
+
+	; strings usadas para outputs
+
+	Construir_nome	db	    "            $"	
+	PalavraI		db	    "I           $"	
+	PalavraIS		db	    "IS          $"	
+	PalavraISE		db	    "ISE         $"	
+	PalavraISEC		db	    "ISEC        $"	
+	PalavraD		db	    "D           $"	
+	PalavraDE		db	    "DE          $"	
+	PalavraDEI		db	    "DEI         $"	
+	PalavraDEIS		db	    "DEIS        $"	
+	PalavraT		db	    "T           $"	
+	PalavraTA		db	    "TA          $"	
+	PalavraTAC		db	    "TAC         $"	
+
+	Dim_nome		dw		5	; Comprimento do Nome
+	indice_nome		dw		0	; indice que aponta para Construir_nome
+	
+	; FIM DO JOGO - deprecated (os nossos têm mais piada)
+
+	;Fim_Ganhou		db	    " Ganhou $"	
+	;Fim_Perdeu		db	    " Perdeu $"	
+
+	; FICHEIROS
+
+	Erro_Open       db      'Erro ao tentar abrir o ficheiro$'
+	Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
+	Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
+	Fich1         	db      'LAB1.TXT',0
+	Fich2         	db      'LAB2.TXT',0
+	Fich3         	db      'LAB3.TXT',0
+	FichTop10		db		'TOP10.TXT',0
+	HandleFich      dw      0
+	car_fich        db      ?
+
+	string			db	"Teste pratico de T.I",0
+	Car				db	32	; Guarda um caracter do Ecra
+	Cor				db	7	; Guarda os atributos de cor do caracter
+
+	; coordenadas
+
+	POSy			db  10	; a linha pode ir de [1 .. 25]
+	POSx			db	40	; POSx pode ir [1..80]	
+	POSya			db	3	; posicao anterior de y
+	POSxa			db	3	; posicao anterior de x
 		
-        MenuOptions db "                                                          ",13,10
-					db "                    **************************************",13,10
-					db "                    *                                    *",13,10
-					db "                    *                                    *",13,10
-					db "                    *   ISEC - Trabalho Pratico de TAC   *",13,10
-					db "                    *                                    *",13,10
-					db "                    *                                    *",13,10
-                    db "                    *   1. Jogar                         *",13,10
-                    db "                    *   2. Top 10                        *",13,10
-					db "                    *   3. Ajuda                         *",13,10
-                    db "                    *   4. Sair                          *",13,10
-					db "                    *                                    *",13,10
-					db "                    *                                    *",13,10
-					db "                    **************************************",13,10
-					db "                                                          ",13,10
-					db "                                                          ",13,10
-					db "                                                          ",13,10,'$'
-					
-		; MENU AJUDA
-
-        Ajuda       db "                                                          ",13,10
-					db "                    **************************************",13,10
-					db "                    *                                    *",13,10
-					db "                    *                Ajuda               *",13,10
-					db "                    *                                    *",13,10
-					db "                    *   Neste jogo seras colocado num    *",13,10
-					db "                    *  labirinto. No labirinto, teras de *",13,10
-                    db "                    *  guiar o teu avatar para encontrar *",13,10
-                    db "                    *  as letras da palavra pedida.      *",13,10
-					db "                    *   A medida que o fizeres, vais     *",13,10
-                    db "                    *  passar de nivel, e seras pontuado *",13,10
-					db "                    *  com base no tempo em que          *",13,10
-					db "                    *  demoraste a completar os niveis.  *",13,10
-                    db "                    *                                    *",13,10
-                    db "                    *  Boa sorte!                        *",13,10
-					db "                    *                                    *",13,10
-					db "                    **************************************",13,10
-					db "                                                          ",13,10
-					db "                                                          ",13,10,'$'
-
-		; OUTPUT QUANDO O JOGADOR GANHA
-
-		FINALGANHO  db "                                                          ",13,10
-					db "                    **************************************",13,10
-					db "                    *                                    *",13,10
-					db "                    *                                    *",13,10
-					db "                    *          Ganhou - Parabens!        *",13,10
-					db "                    *                                    *",13,10
-					db "                    *                                    *",13,10
-					db "                    **************************************",13,10
-					db "                                                          ",13,10
-					db "                                                          ",13,10,'$'
-
-		; OUTPUT QUANDO O JOGADOR PERDE
-
-		FINALPERDEU db "                                                          ",13,10
-					db "                    **************************************",13,10
-					db "                    *                                    *",13,10
-					db "                    *                                    *",13,10
-					db "                    *      Perdeu - Esgotou o tempo      *",13,10
-					db "                    *                                    *",13,10
-					db "                    *                                    *",13,10
-					db "                    **************************************",13,10
-					db "                                                          ",13,10
-					db "                                                          ",13,10,'$'
-
-		; TEXTO BEM VINDO
-
-		Bem_Vindo	db "Bem-vindo ao Jogo do Labirinto! Have fun ;)",13,10
-					db "Prima qualquer tecla para continuar...!    ",13,10,'$'
-					
-
-		; TEXTO TOP10
-
-		CarrTop10	db "Prima qualquer tecla para voltar ao menu!",13,10
-					db "                                                       	",13,10
-					db "                                                       	",13,10
-					db " Top 10:												",13,10,'$'
-
-		; VARIAVEIS ETC.
-        
-		; Parede		db		"177" ; deprecated
-		; TEMPVAR1		dw		0
-		; TEMPVAR2		db		0
-		; TEMPVAR3		dw		1
-		; TEMPVAR4		dw		0
-        UserInputMenu   dw  ?
-		NIVELATUAL		dw		0
-		STR12	 		DB 		"            "	; String para 12 digitos
-		STR10			DB		"          "
-		DDMMAAAA 		db		"                     "
-		
-		; CONTADOR
-
-		timer			dw 		'0'				; Contador de tempo
-		Horas			dw		0				; Vai guardar a hora atual
-		Minutos			dw		0				; Vai guardar os minutos actuais
-		Segundos		dw		0				; Vai guardar os segundos actuais
-		Old_seg			dw		0				; Guarda os ultimos segundos que foram lidos
-		Tempo_init		dw		0				; Guarda o tempo de inicio do jogo
-		Tempo_j			dw		-1				; Guarda o tempo que decorre o jogo
-		Tempo_limite	dw		100				; tempo maximo de Jogo
-		String_TJ		db		"     / 100$"
-
-		; PALAVRAS
-
-		String_num 		db 		"  0 $"
-
-		; strings manuais p/ficheiro
-
-        String_Inic  	db	    "ISEC  $"	
-		String_Lvl2  	db	    "DEIS  $"	
-		String_Lvl3  	db	    "TAC   $"	
-
-		; strings auto - deprecated
-
-		;STRINGCHARS	dw		4
-		;STRINGSAUTO	db		"ISEC  $"
-		;				db		"DEIS  $"
-		;				db		"TAC   $"
-
-		Construir_nome	db	    "            $"	
-		PalavraI		db	    "I           $"	
-		PalavraIS		db	    "IS          $"	
-		PalavraISE		db	    "ISE         $"	
-		PalavraISEC		db	    "ISEC        $"	
-		PalavraD		db	    "D           $"	
-		PalavraDE		db	    "DE          $"	
-		PalavraDEI		db	    "DEI         $"	
-		PalavraDEIS		db	    "DEIS        $"	
-		PalavraT		db	    "T           $"	
-		PalavraTA		db	    "TA          $"	
-		PalavraTAC		db	    "TAC         $"	
-
-		Dim_nome		dw		5	; Comprimento do Nome
-		indice_nome		dw		0	; indice que aponta para Construir_nome
-		
-		; FIM DO JOGO - deprecated (os nossos têm mais piada)
-
-		;Fim_Ganhou		db	    " Ganhou $"	
-		;Fim_Perdeu		db	    " Perdeu $"	
-
-		; FICHEIROS
-
-        Erro_Open       db      'Erro ao tentar abrir o ficheiro$'
-        Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
-        Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
-        Fich1         	db      'LAB1.TXT',0
-        Fich2         	db      'LAB2.TXT',0
-        Fich3         	db      'LAB3.TXT',0
-		FichTop10		db		'TOP10.TXT',0
-        HandleFich      dw      0
-        car_fich        db      ?
-
-		string			db	"Teste pratico de T.I",0
-		Car				db	32	; Guarda um caracter do Ecra
-		Cor				db	7	; Guarda os atributos de cor do caracter
-
-		; coordenadas
-
-		POSy			db  10	; a linha pode ir de [1 .. 25]
-		POSx			db	40	; POSx pode ir [1..80]	
-		POSya			db	3	; posicao anterior de y
-		POSxa			db	3	; posicao anterior de x
-			
-		; Variáveis da criação de ficheiro
-		
-		fname	db	'TOP10.TXT',0 ;ficheiro top10
-		fhandle dw	0
-		buffer	db	'1 5 6 7 8 9 1 5 7 8 9 2 3 7 8 15 16 18 19 20 3',13,10
-				db 	'+ - / * * + - - + * / * + - - + * / + - - + * ',13,10
-				db	'10 12 14 7 9 11 13 5 10 15 7 8 9 10 13 5 10 11',13,10 
-				db 	'/ * + - - + * / + - / * * + - - + * * + - - + ',13,10
-				db	'3 45 23 11 4 7 14 18 31 27 19 9 6 47 19 9 6 51',13,10
-				db	'______________________________________________',13,10
-		msgErrorCreate	db	"Ocorreu um erro na criacao do ficheiro!$"
-		msgErrorWrite	db	"Ocorreu um erro na escrita para ficheiro!$"
-		msgErrorClose	db	"Ocorreu um erro no fecho do ficheiro!$"
-		
-		
-		; Horas
-		NUM_SP		db		"                    $" 	; Para apagar zona de ecra
+	; Variáveis da criação de ficheiro
+	
+	fname	db	'TOP10.TXT',0 ;ficheiro top10
+	fhandle dw	0
+	buffer	db	'1 5 6 7 8 9 1 5 7 8 9 2 3 7 8 15 16 18 19 20 3',13,10
+			db 	'+ - / * * + - - + * / * + - - + * / + - - + * ',13,10
+			db	'10 12 14 7 9 11 13 5 10 15 7 8 9 10 13 5 10 11',13,10 
+			db 	'/ * + - - + * / + - / * * + - - + * * + - - + ',13,10
+			db	'3 45 23 11 4 7 14 18 31 27 19 9 6 47 19 9 6 51',13,10
+			db	'______________________________________________',13,10
+	msgErrorCreate	db	"Ocorreu um erro na criacao do ficheiro!$"
+	msgErrorWrite	db	"Ocorreu um erro na escrita para ficheiro!$"
+	msgErrorClose	db	"Ocorreu um erro no fecho do ficheiro!$"
+	
+	
+	; Horas
+	NUM_SP		db		"                    $" 	; Para apagar zona de ecra
 
 
-		; testes do café
-		apaga_letra	db	    " $"
+	; testes do café
+	apaga_letra	db	    " $"
 		
 dseg	ends ; fim do segmento "D"
 
@@ -239,11 +247,11 @@ assume		cs:cseg, ds:dseg, ss:pilha
 ; macro para manusear posicoes no ecra "X,Y"
 
 goto_xy	macro	POSx,POSy
-		mov		ah,02h
-		mov		bh,0		; numero da pagina
-		mov		dl,POSx
-		mov		dh,POSy
-		int		10h
+	mov		ah,02h
+	mov		bh,0		; numero da pagina
+	mov		dl,POSx
+	mov		dh,POSy
+	int		10h
 endm
 
 ; MOSTRA - Faz o display de uma string terminada em $
@@ -267,22 +275,22 @@ ENDM
 
 LE_TECLA	PROC
 sem_tecla:
-		call Trata_Horas
-		MOV	AH,0BH
-		INT 21h
-		cmp AL,0
-		je	sem_tecla
-		
-		MOV	AH,08H
-		INT	21H
-		MOV	AH,0
-		CMP	AL,0
-		JNE	SAI_TECLA
-		MOV	AH, 08H
-		INT	21H
-		MOV	AH,1
+	call Trata_Horas
+	MOV	AH,0BH
+	INT 21h
+	cmp AL,0
+	je	sem_tecla
+	
+	MOV	AH,08H
+	INT	21H
+	MOV	AH,0
+	CMP	AL,0
+	JNE	SAI_TECLA
+	MOV	AH, 08H
+	INT	21H
+	MOV	AH,1
 SAI_TECLA:	
-		RET
+	RET
 LE_TECLA	ENDP
 
 
@@ -290,17 +298,17 @@ LE_TECLA	ENDP
 
 
 apaga_ecra	proc
-			mov		ax,0B800h
-			mov		es,ax
-			xor		bx,bx
-			mov		cx,25*80
-		
+	mov		ax,0B800h
+	mov		es,ax
+	xor		bx,bx
+	mov		cx,25*80
+
 apaga:		mov		byte ptr es:[bx],' '
-			mov		byte ptr es:[bx+1],7
-			inc		bx
-			inc 	bx
-			loop	apaga
-			ret
+	mov		byte ptr es:[bx+1],7
+	inc		bx
+	inc 	bx
+	loop	apaga
+	ret
 apaga_ecra	endp
 
 
@@ -317,53 +325,53 @@ apaga_ecra	endp
 
 IMP_FICH1	PROC
 
-		;abre ficheiro
-        mov     ah,3dh
-        mov     al,0
-		; FICHEIRO = LABIRINTO 1
-        lea     dx,Fich1
-        int     21h
-        jc      erro_abrir
-        mov     HandleFich,ax
-        jmp     ler_ciclo
+	;abre ficheiro
+	mov     ah,3dh
+	mov     al,0
+	; FICHEIRO = LABIRINTO 1
+	lea     dx,Fich1
+	int     21h
+	jc      erro_abrir
+	mov     HandleFich,ax
+	jmp     ler_ciclo
 
 erro_abrir:
-        mov     ah,09h
-        lea     dx,Erro_Open
-        int     21h
-        jmp     sai_f
+	mov     ah,09h
+	lea     dx,Erro_Open
+	int     21h
+	jmp     sai_f
 
 ler_ciclo:
-        mov     ah,3fh
-        mov     bx,HandleFich
-        mov     cx,1
-        lea     dx,car_fich
-        int     21h
-		jc		erro_ler
-		cmp		ax,0		;EOF?
-		je		fecha_ficheiro
-        mov     ah,02h
-		mov		dl,car_fich
-		int		21h
-		jmp		ler_ciclo
+	mov     ah,3fh
+	mov     bx,HandleFich
+	mov     cx,1
+	lea     dx,car_fich
+	int     21h
+	jc		erro_ler
+	cmp		ax,0		;EOF?
+	je		fecha_ficheiro
+	mov     ah,02h
+	mov		dl,car_fich
+	int		21h
+	jmp		ler_ciclo
 
 erro_ler:
-        mov     ah,09h
-        lea     dx,Erro_Ler_Msg
-        int     21h
+	mov     ah,09h
+	lea     dx,Erro_Ler_Msg
+	int     21h
 
 fecha_ficheiro:
-        mov     ah,3eh
-        mov     bx,HandleFich
-        int     21h
-        jnc     sai_f
-        mov     ah,09h
-        lea     dx,Erro_Close
-        Int     21h
+	mov     ah,3eh
+	mov     bx,HandleFich
+	int     21h
+	jnc     sai_f
+	mov     ah,09h
+	lea     dx,Erro_Close
+	Int     21h
 
 sai_f:	
-		RET
-		
+	RET
+	
 IMP_FICH1	endp		
 
 ; -------------------------------------------
@@ -372,53 +380,53 @@ IMP_FICH1	endp
 
 IMP_FICH2	PROC
 
-		;abre ficheiro
-        mov     ah,3dh
-        mov     al,0
-		; FICHEIRO = LABIRINTO 2
-        lea     dx,Fich2
-        int     21h
-        jc      erro_abrir2
-        mov     HandleFich,ax
-        jmp     ler_ciclo2
+	;abre ficheiro
+	mov     ah,3dh
+	mov     al,0
+	; FICHEIRO = LABIRINTO 2
+	lea     dx,Fich2
+	int     21h
+	jc      erro_abrir2
+	mov     HandleFich,ax
+	jmp     ler_ciclo2
 
 erro_abrir2:
-        mov     ah,09h
-        lea     dx,Erro_Open
-        int     21h
-        jmp     sai_f2
+	mov     ah,09h
+	lea     dx,Erro_Open
+	int     21h
+	jmp     sai_f2
 
 ler_ciclo2:
-        mov     ah,3fh
-        mov     bx,HandleFich
-        mov     cx,1
-        lea     dx,car_fich
-        int     21h
-		jc		erro_ler2
-		cmp		ax,0		;EOF?
-		je		fecha_ficheiro2
-        mov     ah,02h
-		mov		dl,car_fich
-		int		21h
-		jmp		ler_ciclo2
+	mov     ah,3fh
+	mov     bx,HandleFich
+	mov     cx,1
+	lea     dx,car_fich
+	int     21h
+	jc		erro_ler2
+	cmp		ax,0		;EOF?
+	je		fecha_ficheiro2
+	mov     ah,02h
+	mov		dl,car_fich
+	int		21h
+	jmp		ler_ciclo2
 
 erro_ler2:
-        mov     ah,09h
-        lea     dx,Erro_Ler_Msg
-        int     21h
+	mov     ah,09h
+	lea     dx,Erro_Ler_Msg
+	int     21h
 
 fecha_ficheiro2:
-        mov     ah,3eh
-        mov     bx,HandleFich
-        int     21h
-        jnc     sai_f2
+	mov     ah,3eh
+	mov     bx,HandleFich
+	int     21h
+	jnc     sai_f2
 
-        mov     ah,09h
-        lea     dx,Erro_Close
-        Int     21h
+	mov     ah,09h
+	lea     dx,Erro_Close
+	Int     21h
 
 sai_f2:	
-		RET
+	RET
 		
 IMP_FICH2	endp		
 
@@ -428,54 +436,57 @@ IMP_FICH2	endp
 
 IMP_FICH3	PROC
 
-		;abre ficheiro
-        mov     ah,3dh
-        mov     al,0
-		; FICHEIRO = LABIRINTO 3
-        lea     dx,Fich3
-        int     21h
-        jc      erro_abrir3
-        mov     HandleFich,ax
-        jmp     ler_ciclo3
+	;abre ficheiro
+
+	mov     ah,3dh
+	mov     al,0
+
+	; FICHEIRO = LABIRINTO 3
+
+	lea     dx,Fich3
+	int     21h
+	jc      erro_abrir3
+	mov     HandleFich,ax
+	jmp     ler_ciclo3
 
 erro_abrir3:
-        mov     ah,09h
-        lea     dx,Erro_Open
-        int     21h
-        jmp     sai_f3
+	mov     ah,09h
+	lea     dx,Erro_Open
+	int     21h
+	jmp     sai_f3
 
 ler_ciclo3:
-        mov     ah,3fh
-        mov     bx,HandleFich
-        mov     cx,1
-        lea     dx,car_fich
-        int     21h
-		jc		erro_ler3
-		cmp		ax,0		;EOF?
-		je		fecha_ficheiro3
-        mov     ah,02h
-		mov		dl,car_fich
-		int		21h
-		jmp		ler_ciclo3
+	mov     ah,3fh
+	mov     bx,HandleFich
+	mov     cx,1
+	lea     dx,car_fich
+	int     21h
+	jc		erro_ler3
+	cmp		ax,0		;EOF?
+	je		fecha_ficheiro3
+	mov     ah,02h
+	mov		dl,car_fich
+	int		21h
+	jmp		ler_ciclo3
 
 erro_ler3:
-        mov     ah,09h
-        lea     dx,Erro_Ler_Msg
-        int     21h
+	mov     ah,09h
+	lea     dx,Erro_Ler_Msg
+	int     21h
 
 fecha_ficheiro3:
-        mov     ah,3eh
-        mov     bx,HandleFich
-        int     21h
-        jnc     sai_f3
+	mov     ah,3eh
+	mov     bx,HandleFich
+	int     21h
+	jnc     sai_f3
 
-        mov     ah,09h
-        lea     dx,Erro_Close
-        Int     21h
+	mov     ah,09h
+	lea     dx,Erro_Close
+	Int     21h
 
 sai_f3:	
-		RET
-		
+	RET
+	
 IMP_FICH3	endp		
 
 ; ------------------------------------------------------------------
@@ -489,40 +500,40 @@ IMP_FICH3	endp
 PALAVRA_A_COMPLETAR	PROC
  	
 	INICIOWORD:
-			jmp	VERIFICANIVEL ; VAI VERIFICAR EM QUE LVL ESTA O JOGADOR
+		jmp	VERIFICANIVEL ; VAI VERIFICAR EM QUE LVL ESTA O JOGADOR
 
 	PALAVRALABI1:
-			; Palavra a procurar
-			goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 1
-			mov     ah, 09h
-			lea     dx, String_Inic ; ISEC
-			int		21H	
-			jmp		FIM
+		; Palavra a procurar
+		goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 1
+		mov     ah, 09h
+		lea     dx, String_Inic ; ISEC
+		int		21H	
+		jmp		FIM
 
 	PALAVRALABI2:
-			goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
-			mov     ah, 09h
-			lea     dx, String_Lvl2 ; DEIS
-			int		21H	
-			jmp		FIM
+		goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
+		mov     ah, 09h
+		lea     dx, String_Lvl2 ; DEIS
+		int		21H	
+		jmp		FIM
 
 	PALAVRALABI3:
-			; Palavra a procurar
-			goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
-			mov     ah, 09h
-			lea     dx, String_Lvl3 ; TAC
-			int		21H	
-			jmp		FIM
+		; Palavra a procurar
+		goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
+		mov     ah, 09h
+		lea     dx, String_Lvl3 ; TAC
+		int		21H	
+		jmp		FIM
 
 	VERIFICANIVEL:
-			cmp 	NIVELATUAL, 49 ; 1
-			je		PALAVRALABI1
+		cmp 	NIVELATUAL, 49 ; 1
+		je		PALAVRALABI1
 
-			cmp 	NIVELATUAL, 50 ; 2
-			je		PALAVRALABI2
+		cmp 	NIVELATUAL, 50 ; 2
+		je		PALAVRALABI2
 
-			cmp 	NIVELATUAL, 51 ; 3
-			je		PALAVRALABI3
+		cmp 	NIVELATUAL, 51 ; 3
+		je		PALAVRALABI3
 
 	FIM:	
 		RET
@@ -550,289 +561,309 @@ TEMPO_TIMER	ENDP
 AVATAR	PROC
 
 	Inicio:		
-			mov		ax,0B800h
-			mov		es,ax
+		mov		ax,0B800h
+		mov		es,ax
 
-			goto_xy	POSx,POSy		; Vai para nova possição
-			mov 	ah, 08h			; Guarda o Caracter que está na posição do Cursor
-			mov		bh,0			; numero da página
-			int		10h			
-			mov		Car, al			; Guarda o Caracter que está na posição do Cursor
-			mov		Cor, ah			; Guarda a cor que está na posição do Cursor	
-			jmp 	CICLO
+		goto_xy	POSx,POSy		; Vai para nova possição
+		mov 	ah, 08h			; Guarda o Caracter que está na posição do Cursor
+		mov		bh,0			; numero da página
+		int		10h			
+		mov		Car, al			; Guarda o Caracter que está na posição do Cursor
+		mov		Cor, ah			; Guarda a cor que está na posição do Cursor	
+		jmp 	CICLO
 
 	; GERENCIADOR DA DETEÇÃO DE PAREDES
 
 	PAREDE:
-			; retorna o filho atrás, já que ele está a ir contra a parede
-			mov		al, POSxa	   
-			mov		POSx, al
-			mov		al, POSya	 
-			mov 	POSy, al
-			jmp 	Inicio
+		; retorna o filho atrás, já que ele está a ir contra a parede
+		mov		al, POSxa	   
+		mov		POSx, al
+		mov		al, POSya	 
+		mov 	POSy, al
+		jmp 	Inicio
 
 			 
 	; -------------------- LETRAS ---------------------
 
 	; >>>>>>>>>>>>>>>>>>>> NIVEL 1 <<<<<<<<<<<<<<<<<<<<
 
-	ADICIONAR_I:
-	  		goto_xy	10,22
-			MOSTRA	PalavraI
-			goto_xy 38,11 			; Onde está o I no labirinto 1
-			MOSTRA  apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	Inicio
+ADICIONAR_I:
+		goto_xy	10,22
+		MOSTRA	PalavraI
+		goto_xy 38,11 			; Onde está o I no labirinto 1
+		MOSTRA  apaga_letra
+		mov		progressoC, 50	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
 
 
 	ADICIONAR_IS:
-	  		goto_xy	10,22
-			MOSTRA	PalavraIS
-			goto_xy 32,5 			; Onde está o S no labirinto 1
-			MOSTRA	apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	Inicio
+		goto_xy	10,22
+		MOSTRA	PalavraIS
+		goto_xy 32,5 			; Onde está o S no labirinto 1
+		MOSTRA	apaga_letra
+		mov		progressoC, 51	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
 
 	ADICIONAR_ISE:
-	  		goto_xy	10,22
-			MOSTRA	PalavraISE
-			goto_xy 75,17			; Onde está o E no labirinto 1
-			MOSTRA	apaga_letra	
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	Inicio
+		goto_xy	10,22
+		MOSTRA	PalavraISE
+		goto_xy 75,17			; Onde está o E no labirinto 1
+		MOSTRA	apaga_letra	
+		mov		progressoC, 52	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
 
 	ADICIONAR_ISEC:
-	  		goto_xy	10,22
-			MOSTRA	PalavraISEC
-			goto_xy 24,19 			; Onde está o C no labirinto 1
-			MOSTRA	apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			call	JOGAR2
+		goto_xy	10,22
+		MOSTRA	PalavraISEC
+		goto_xy 24,19 			; Onde está o C no labirinto 1
+		MOSTRA	apaga_letra
+		mov		progressoC, 53	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		call	JOGAR2
 			
 	; >>>>>>>>>>>>>>>>>>>> NIVEL 2 <<<<<<<<<<<<<<<<<<<<
 
 	ADICIONAR_D:
-	  		goto_xy	10,22
-			MOSTRA	PalavraD
-			goto_xy 2,6 			; Onde está o D no labirinto 2
-			MOSTRA	apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	Inicio
+		goto_xy	10,22
+		MOSTRA	PalavraD
+		goto_xy 2,6 			; Onde está o D no labirinto 2
+		MOSTRA	apaga_letra
+		mov		progressoC, 50	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
 
 	ADICIONAR_DE:
-	  		goto_xy	10,22
-			MOSTRA	PalavraDE
-			goto_xy 63,15 			; Onde está o E no labirinto 2
-			MOSTRA	apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	Inicio
+		goto_xy	10,22
+		MOSTRA	PalavraDE
+		goto_xy 63,15 			; Onde está o E no labirinto 2
+		MOSTRA	apaga_letra
+		mov		progressoC, 51	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
 
 	ADICIONAR_DEI:
-	  		goto_xy	10,22
-			MOSTRA	PalavraDEI
-			goto_xy 2,19 			; Onde está o I no labirinto 2
-			MOSTRA	apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	Inicio
+		goto_xy	10,22
+		MOSTRA	PalavraDEI
+		goto_xy 2,19 			; Onde está o I no labirinto 2
+		MOSTRA	apaga_letra
+		mov		progressoC, 52	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
 
 	ADICIONAR_DEIS:
-	  		goto_xy	10,22
-			MOSTRA	PalavraDEIS
-			goto_xy 71,3 			; Onde está o S no labirinto 2
-			MOSTRA	apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	JOGAR3
+		goto_xy	10,22
+		MOSTRA	PalavraDEIS
+		goto_xy 71,3 			; Onde está o S no labirinto 2
+		MOSTRA	apaga_letra
+		mov		progressoC, 53	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	JOGAR3
 
 	; >>>>>>>>>>>>>>>>>>>> NIVEL 3 <<<<<<<<<<<<<<<<<<<<
 
 	ADICIONAR_T:
-	  		goto_xy	10,22
-			MOSTRA	PalavraT
-			goto_xy 45,10 			; Onde está o T no labirinto 3
-			MOSTRA	apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	Inicio
+		goto_xy	10,22
+		MOSTRA	PalavraT
+		goto_xy 45,10 			; Onde está o T no labirinto 3
+		MOSTRA	apaga_letra
+		mov		progressoC, 50	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
 
 	ADICIONAR_TA:
-	  		goto_xy	10,22
-			MOSTRA	PalavraTA
-			goto_xy 55,17 			; Onde está o A no labirinto 3
-			MOSTRA	apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	Inicio
+		goto_xy	10,22
+		MOSTRA	PalavraTA
+		goto_xy 55,17 			; Onde está o A no labirinto 3
+		MOSTRA	apaga_letra
+		mov		progressoC, 51	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
 
 	ADICIONAR_TAC:
-	  		goto_xy	10,22
-			MOSTRA	PalavraTAC
-			goto_xy 10,15 			; Onde está o C no labirinto 3
-			MOSTRA	apaga_letra
-			mov		al, POSxa	    ; Guarda a posicao do cursor
-			mov		POSx, al
-			mov		al, POSya	    ; Guarda a posicao do cursor
-			mov 	POSy, al
-			jmp 	GanhouText
+		goto_xy	10,22
+		MOSTRA	PalavraTAC
+		goto_xy 10,15 			; Onde está o C no labirinto 3
+		MOSTRA	apaga_letra
+		mov		progressoC, 52	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	GanhouText
+
+	; RESETA O PROGRESSO NA PALAVRA
+
+	RESETA_PROGRESSO:
+		goto_xy 10,22
+		MOSTRA	Construir_nome
+		mov		progressoC, 49	; ProgressoNaPalavra reset
 
 	; CICLO
 
 	CICLO:	
-			goto_xy	POSxa,POSya		; Vai para a posição anterior do cursor
-			
-			mov		ah, 02h
-			mov		dl, Car			; Repoe Caracter guardado 
-			int		21H		
+		goto_xy	POSxa,POSya		; Vai para a posição anterior do cursor
 		
-			goto_xy	POSx,POSy		; Vai para nova possição
+		mov		ah, 02h
+		mov		dl, Car			; Repoe Caracter guardado 
+		int		21H		
+	
+		goto_xy	POSx,POSy		; Vai para nova possição
 
-			mov 	ah, 08h
-			mov		bh,0			; numero da página
-			int		10h		
+		mov 	ah, 08h
+		mov		bh,0			; numero da página
+		int		10h		
 
-			mov		Car, al			; Guarda o Caracter que está na posição do Cursor
-			mov		Cor, ah			; Guarda a cor que está na posição do Cursor
-			
-			goto_xy	78,0			; Mostra o caractr que estava na posição do AVATAR
-			mov		ah, 02h			; IMPRIME caracter da posição no canto
-			mov		dl, Car	
-			int		21H		
-			
-			; call	Ver_Tecla
-			
-			cmp		al, 177
-			je		PAREDE
-			
-			goto_xy	POSx,POSy		; Coloca o avatar na posicao do cursor
-			
+		mov		Car, al			; Guarda o Caracter que está na posição do Cursor
+		mov		Cor, ah			; Guarda a cor que está na posição do Cursor
+		
+		goto_xy	78,0			; Mostra o caractr que estava na posição do AVATAR
+		mov		ah, 02h			; IMPRIME caracter da posição no canto
+		mov		dl, Car	
+		int		21H		
+		
+		; call	Ver_Tecla
+		
+		cmp		al, 177
+		je		PAREDE
+		
+		goto_xy	POSx,POSy		; Coloca o avatar na posicao do cursor
+		
+		; VERIFICA O NIVEL E ATRIBUI AS PALAVRAS A ENCONTRAR
 
-			cmp 	NIVELATUAL, 49
-			je		PALAVRANIVEL1
-			
-			cmp 	NIVELATUAL, 50
-			je		PALAVRANIVEL2
+		cmp 	NIVELATUAL, 49
+		je		PALAVRANIVEL1
+		
+		cmp 	NIVELATUAL, 50
+		je		PALAVRANIVEL2
 
-			cmp 	NIVELATUAL, 51
-			je		PALAVRANIVEL3
+		cmp 	NIVELATUAL, 51
+		je		PALAVRANIVEL3
 
 	; GERENCIADOR DE PALAVRAS / NIVEL
 
 	PALAVRANIVEL1:		
-			cmp		al, 73			;I
-	 		je		ADICIONAR_I
-			
-	 		cmp		al, 83			;S
-	 		je		ADICIONAR_IS
-			
-	 		cmp		al, 69			;E
-	 		je		ADICIONAR_ISE
-			
-	 		cmp		al, 67			;C
-	 		je		ADICIONAR_ISEC
+		
+		cmp		al, 73			;I
+		je		ADICIONAR_I
+		
+		cmp		al, 83			;S
+		je		ADICIONAR_IS
+		
+		cmp		al, 69			;E
+		je		ADICIONAR_ISE
+		
+		cmp		al, 67			;C
+		je		ADICIONAR_ISEC
 
 	PALAVRANIVEL2:		
-			cmp		al, 68			;D
-	 		je		ADICIONAR_D
-			
-	 		cmp		al, 69			;E
-	 		je		ADICIONAR_DE
-			
-	 		cmp		al, 73			;I
-	 		je		ADICIONAR_DEI
-			
-	 		cmp		al, 83			;S
-	 		je		ADICIONAR_DEIS
+		cmp		al, 68			;D
+		je		ADICIONAR_D
+		
+		cmp		al, 69			;E
+		je		ADICIONAR_DE
+		
+		cmp		al, 73			;I
+		je		ADICIONAR_DEI
+		
+		cmp		al, 83			;S
+		je		ADICIONAR_DEIS
 
 	PALAVRANIVEL3:		
-			cmp		al, 84			;T
-	 		je		ADICIONAR_T
-			
-	 		cmp		al, 65			;A
-	 		je		ADICIONAR_TA
-			
-	 		cmp		al, 67			;C
-	 		je		ADICIONAR_TAC
+		cmp		al, 84			;T
+		je		ADICIONAR_T
+		
+		cmp		al, 65			;A
+		je		ADICIONAR_TA
+		
+		cmp		al, 67			;C
+		je		ADICIONAR_TAC
 
 	; IMPRIME AVATAR
 
 	IMPRIME:	
-            mov		ah, 02h
-			mov		dl, 4			; !!! CHAR AVATAR !!!
-			int		21H	
-			goto_xy	POSx,POSy	    ; Vai para posicao do cursor
-			
-			mov		al, POSx	    ; Guarda a posicao do cursor
-			mov		POSxa, al
-			mov		al, POSy	    ; Guarda a posicao do cursor
-			mov 	POSya, al
+		mov		ah, 02h
+		mov		dl, 4			; !!! CHAR AVATAR !!!
+		int		21H	
+		goto_xy	POSx,POSy	    ; Vai para posicao do cursor
+		
+		mov		al, POSx	    ; Guarda a posicao do cursor
+		mov		POSxa, al
+		mov		al, POSy	    ; Guarda a posicao do cursor
+		mov 	POSya, al
 		
 	; LE INPUT DO TECLADO; SAI COM ESC	
 
 	LER_SETA:
-        	call 	LE_TECLA
-			cmp		ah, 1
-			je		ESTEND
-			cmp 	AL, 27		; ESC
-			JE		SAI_PROG
-			jmp		LER_SETA
+		call 	LE_TECLA
+		cmp		ah, 1
+		je		ESTEND
+		cmp 	AL, 27		; ESC
+		JE		SAI_PROG
+		jmp		LER_SETA
 		
 	ESTEND:		
-            cmp 	al,48h
-			jne		BAIXO
-			dec		POSy		; cima
-			jmp		CICLO
+		cmp 	al,48h
+		jne		BAIXO
+		dec		POSy		; cima
+		jmp		CICLO
 
     BAIXO:
-    		cmp		al,50h
-			jne		ESQUERDA
-			inc 	POSy		; baixo
-			jmp		CICLO
+		cmp		al,50h
+		jne		ESQUERDA
+		inc 	POSy		; baixo
+		jmp		CICLO
 
     ESQUERDA:
-			cmp		al,4Bh
-			jne		DIREITA
-			dec		POSx		; esquerda
-			jmp		CICLO
+		cmp		al,4Bh
+		jne		DIREITA
+		dec		POSx		; esquerda
+		jmp		CICLO
 
 	DIREITA:
-			cmp		al,4Dh
-			jne		LER_SETA 
-			inc		POSx		; direita
-			jmp		CICLO	
+		cmp		al,4Dh
+		jne		LER_SETA 
+		inc		POSx		; direita
+		jmp		CICLO	
 
 	SAI_PROG:
-			mov  ax, 4c00h
-			int  21h
+		mov  ax, 4c00h
+		int  21h
 
     FIMAVA:		
-			RET
+		RET
 		
 	FIMTESTE:
 	RET
@@ -959,7 +990,8 @@ JOGAR	PROC
 	call		apaga_ecra  ; apaga o ecra
 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
     call		IMP_FICH1   ; procedimento que imprime o conteudo do ficheiro
-	mov			NIVELATUAL, 49
+	mov			NIVELATUAL, 49 ; LVL 1
+	mov			progressoC, 49 ; PROG 1
 	call		PALAVRA_A_COMPLETAR	
 	call		TEMPO_TIMER
 	call 		AVATAR      ; procedimento do avatar
@@ -974,7 +1006,8 @@ JOGAR2	PROC
 	call		apaga_ecra  ; apaga o ecra
 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
     call		IMP_FICH2   ; procedimento que imprime o conteudo do ficheiro
-	mov			NIVELATUAL, 50
+	mov			NIVELATUAL, 50 ; LVL 2
+	mov			progressoC, 49 ; PROG 1
 	call		PALAVRA_A_COMPLETAR
 	call		TEMPO_TIMER
 	call 		AVATAR      ; procedimento do avatar
@@ -989,7 +1022,8 @@ JOGAR3	PROC
 	call		apaga_ecra  ; apaga o ecra
 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
     call		IMP_FICH3   ; procedimento que imprime o conteudo do ficheiro
-	mov			NIVELATUAL, 51
+	mov			NIVELATUAL, 51 ; LVL 3
+	mov			progressoC, 49 ; PROG 1
 	call		PALAVRA_A_COMPLETAR
 	call		TEMPO_TIMER
 	call 		AVATAR      ; procedimento do avatar
