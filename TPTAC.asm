@@ -33,7 +33,7 @@ PILHA	ENDS
 
 dseg	segment para public 'data' ; segmento de codigo "D"
 
-        UserInputMenu   dw  ?
+		; ----------- MENUS -----------
 
 		; MENU INICIAL
 		
@@ -51,6 +51,7 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 					db "                    *                                    *",13,10
 					db "                    *                                    *",13,10
 					db "                    **************************************",13,10
+					db "                                                          ",13,10
 					db "                                                          ",13,10
 					db "                                                          ",13,10,'$'
 					
@@ -76,17 +77,54 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 					db "                                                          ",13,10
 					db "                                                          ",13,10,'$'
 
+		; OUTPUT QUANDO O JOGADOR GANHA
+
+		FINALGANHO  db "                                                          ",13,10
+					db "                    **************************************",13,10
+					db "                    *                                    *",13,10
+					db "                    *                                    *",13,10
+					db "                    *          Ganhou - Parabens!        *",13,10
+					db "                    *                                    *",13,10
+					db "                    *                                    *",13,10
+					db "                    **************************************",13,10
+					db "                                                          ",13,10
+					db "                                                          ",13,10,'$'
+
+		; OUTPUT QUANDO O JOGADOR PERDE
+
+		FINALPERDEU db "                                                          ",13,10
+					db "                    **************************************",13,10
+					db "                    *                                    *",13,10
+					db "                    *                                    *",13,10
+					db "                    *      Perdeu - Esgotou o tempo      *",13,10
+					db "                    *                                    *",13,10
+					db "                    *                                    *",13,10
+					db "                    **************************************",13,10
+					db "                                                          ",13,10
+					db "                                                          ",13,10,'$'
+
 		; TEXTO BEM VINDO
 
-		Bem_Vindo	db "Bem-Vindo ao Jogo do Labirinto! Have fun ;) $"
+		Bem_Vindo	db "Bem-vindo ao Jogo do Labirinto! Have fun ;)",13,10
+					db "Prima qualquer tecla para continuar...!    ",13,10,'$'
+					
+
+		; TEXTO TOP10
+
+		CarrTop10	db "Prima qualquer tecla para voltar ao menu!",13,10
+					db "                                                       	",13,10
+					db "                                                       	",13,10
+					db " Top 10:												",13,10,'$'
 
 		; VARIAVEIS ETC.
         
-		;Parede			db		"177" ; deprecated
-		TEMPVAR1		dw		0
-		TEMPVAR2		db		0
-		TEMPVAR3		dw		1
-		TEMPVAR4		dw		0
+		; Parede		db		"177" ; deprecated
+		; TEMPVAR1		dw		0
+		; TEMPVAR2		db		0
+		; TEMPVAR3		dw		1
+		; TEMPVAR4		dw		0
+        UserInputMenu   dw  ?
+		NIVELATUAL		dw		0
 		STR12	 		DB 		"            "	; String para 12 digitos
 		STR10			DB		"          "
 		DDMMAAAA 		db		"                     "
@@ -99,7 +137,7 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		Segundos		dw		0				; Vai guardar os segundos actuais
 		Old_seg			dw		0				; Guarda os ultimos segundos que foram lidos
 		Tempo_init		dw		0				; Guarda o tempo de inicio do jogo
-		Tempo_j			dw		0				; Guarda o tempo que decorre o jogo
+		Tempo_j			dw		-1				; Guarda o tempo que decorre o jogo
 		Tempo_limite	dw		100				; tempo maximo de Jogo
 		String_TJ		db		"     / 100$"
 
@@ -109,25 +147,37 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 
 		; strings manuais p/ficheiro
 
-        String_Fich1  	db	    "ISEC  $"	
-		String_Fich2  	db	    "ISEC  $"	
-		String_Fich3  	db	    "ISEC  $"	
+        String_Inic  	db	    "ISEC  $"	
+		String_Lvl2  	db	    "DEIS  $"	
+		String_Lvl3  	db	    "TAC   $"	
 
-		; strings auto
+		; strings auto - deprecated
 
-		STRINGCHARS		dw		4
-		STRINGSAUTO		db		"ISEC  $"
-						db		"DEIS  $"
-						db		"MASM  $"
+		;STRINGCHARS	dw		4
+		;STRINGSAUTO	db		"ISEC  $"
+		;				db		"DEIS  $"
+		;				db		"TAC   $"
 
 		Construir_nome	db	    "            $"	
+		PalavraI		db	    "I           $"	
+		PalavraIS		db	    "IS          $"	
+		PalavraISE		db	    "ISE         $"	
+		PalavraISEC		db	    "ISEC        $"	
+		PalavraD		db	    "D           $"	
+		PalavraDE		db	    "DE          $"	
+		PalavraDEI		db	    "DEI         $"	
+		PalavraDEIS		db	    "DEIS        $"	
+		PalavraT		db	    "T           $"	
+		PalavraTA		db	    "TA          $"	
+		PalavraTAC		db	    "TAC         $"	
+
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 		
-		; FIM DO JOGO
+		; FIM DO JOGO - deprecated (os nossos têm mais piada)
 
-		Fim_Ganhou		db	    " Ganhou $"	
-		Fim_Perdeu		db	    " Perdeu $"	
+		;Fim_Ganhou		db	    " Ganhou $"	
+		;Fim_Perdeu		db	    " Perdeu $"	
 
 		; FICHEIROS
 
@@ -137,14 +187,16 @@ dseg	segment para public 'data' ; segmento de codigo "D"
         Fich1         	db      'LAB1.TXT',0
         Fich2         	db      'LAB2.TXT',0
         Fich3         	db      'LAB3.TXT',0
+		FichTop10		db		'TOP10.TXT',0
         HandleFich      dw      0
         car_fich        db      ?
-
-		; ???
 
 		string			db	"Teste pratico de T.I",0
 		Car				db	32	; Guarda um caracter do Ecra
 		Cor				db	7	; Guarda os atributos de cor do caracter
+
+		; coordenadas
+
 		POSy			db  10	; a linha pode ir de [1 .. 25]
 		POSx			db	40	; POSx pode ir [1..80]	
 		POSya			db	3	; posicao anterior de y
@@ -152,7 +204,7 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 			
 		; Variáveis da criação de ficheiro
 		
-		fname	db	'TOP10.TXT',0
+		fname	db	'TOP10.TXT',0 ;ficheiro top10
 		fhandle dw	0
 		buffer	db	'1 5 6 7 8 9 1 5 7 8 9 2 3 7 8 15 16 18 19 20 3',13,10
 				db 	'+ - / * * + - - + * / * + - - + * / + - - + * ',13,10
@@ -170,7 +222,7 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 
 
 		; testes do café
-		wow		db	    " $"
+		apaga_letra	db	    " $"
 		
 dseg	ends ; fim do segmento "D"
 
@@ -206,9 +258,12 @@ MOSTRA MACRO STR
 
 ENDM
 
+
 ; ------------------------------------------------------------------
 
+
 ; PROCEDIMENTO PARA LER UMA TECLA	
+
 
 LE_TECLA	PROC
 sem_tecla:
@@ -217,7 +272,6 @@ sem_tecla:
 		INT 21h
 		cmp AL,0
 		je	sem_tecla
-		
 		
 		MOV	AH,08H
 		INT	21H
@@ -307,13 +361,6 @@ fecha_ficheiro:
         lea     dx,Erro_Close
         Int     21h
 
-imprime_palavra:				;por concluir
-		goto_xy 22,11
-		mov     ah,09h
-        lea     dx,String_Fich1
-        int     21h
-        jnc     sai_f
-
 sai_f:	
 		RET
 		
@@ -369,13 +416,6 @@ fecha_ficheiro2:
         mov     ah,09h
         lea     dx,Erro_Close
         Int     21h
-
-imprime_palavra2:				;por concluir
-		goto_xy 22,11
-		mov     ah,09h
-        lea     dx,String_Fich2
-        int     21h
-        jnc     sai_f2
 
 sai_f2:	
 		RET
@@ -433,13 +473,6 @@ fecha_ficheiro3:
         lea     dx,Erro_Close
         Int     21h
 
-imprime_palavra3:				;por concluir
-		goto_xy 22,11
-		mov     ah,09h
-        lea     dx,String_Fich3
-        int     21h
-        jnc     sai_f3
-
 sai_f3:	
 		RET
 		
@@ -451,117 +484,57 @@ IMP_FICH3	endp
 
 ; PROCS. PARA A PALAVRA A COMPLETAR NO JOGO
 
-; ------- MODO MANUAL - DEPRECATED ---------
+; -------------- MODO MANUAL ----------------
 
-; PALAVRA_A_COMPLETAR1	PROC
-; 	; Palavra a procurar
-; 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 1
-; 	mov     ah, 09h
-; 	lea     dx, String_Fich1
-; 	int		21H	
-; PALAVRA_A_COMPLETAR1	ENDP
+PALAVRA_A_COMPLETAR	PROC
+ 	
+	INICIOWORD:
+			jmp	VERIFICANIVEL ; VAI VERIFICAR EM QUE LVL ESTA O JOGADOR
 
-; PALAVRA_A_COMPLETAR2	PROC
-; 	; Palavra a procurar
-; 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
-; 	mov     ah, 09h
-; 	lea     dx, String_Fich2
-; 	int		21H	
-; PALAVRA_A_COMPLETAR2	ENDP
+	PALAVRALABI1:
+			; Palavra a procurar
+			goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 1
+			mov     ah, 09h
+			lea     dx, String_Inic ; ISEC
+			int		21H	
+			jmp		FIM
 
-; PALAVRA_A_COMPLETAR3	PROC
-; 	; Palavra a procurar
-; 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
-; 	mov     ah, 09h
-; 	lea     dx, String_Fich3
-; 	int		21H	
-; PALAVRA_A_COMPLETAR3	ENDP
+	PALAVRALABI2:
+			goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
+			mov     ah, 09h
+			lea     dx, String_Lvl2 ; DEIS
+			int		21H	
+			jmp		FIM
 
-; ------------- MODO AUTOMATICO ------------
+	PALAVRALABI3:
+			; Palavra a procurar
+			goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
+			mov     ah, 09h
+			lea     dx, String_Lvl3 ; TAC
+			int		21H	
+			jmp		FIM
 
-; PROCEDIMENTO PARA CALCULAR UMA PALAVRA ALEATORIA
+	VERIFICANIVEL:
+			cmp 	NIVELATUAL, 49 ; 1
+			je		PALAVRALABI1
 
-PalavRandom proc
+			cmp 	NIVELATUAL, 50 ; 2
+			je		PALAVRALABI2
 
-			mov ah, 0
-			int 1ah
-			mov ax,dx
-			mov dx,0
-			mov bx, STRINGCHARS
-			div bx
-			mov TEMPVAR4,dx
-			ret
+			cmp 	NIVELATUAL, 51 ; 3
+			je		PALAVRALABI3
 
-PalavRandom endp
+	FIM:	
+		RET
 
+		
+PALAVRA_A_COMPLETAR	ENDP
 
-PALAVRA_A_COMPLETAR1	PROC
-	
-	goto_xy	11,20
-
-	call	PalavRandom ; vai pedir uma palavra aleatoria ao proc
-	mov		ax, TEMPVAR4
-	xor		bx,bx
-	mov		bx, 10
-	mul		bx
-	mov		SI, ax
-	mov		TEMPVAR4, SI
-
-	mov		ah, 09h
-	
-	lea		dx, STRINGSAUTO[SI] ; mostra a palavra escolhida
-	int		21h
-
-	ret
-
-PALAVRA_A_COMPLETAR1	ENDP
-
-PALAVRA_A_COMPLETAR2	PROC
-	
-	goto_xy	11,20
-
-	call	PalavRandom
-	mov		ax, TEMPVAR4
-	xor		bx,bx
-	mov		bx, 10
-	mul		bx
-	mov		SI, ax
-	mov		TEMPVAR4, SI
-
-	mov		ah, 09h
-	
-	lea		dx, STRINGSAUTO[SI]
-	int		21h
-
-	ret
-
-PALAVRA_A_COMPLETAR2	ENDP
-
-PALAVRA_A_COMPLETAR3	PROC
-	
-	goto_xy	11,20
-
-	call	PalavRandom
-	mov		ax, TEMPVAR4
-	xor		bx,bx
-	mov		bx, 10
-	mul		bx
-	mov		SI, ax
-	mov		TEMPVAR4, SI
-
-	mov		ah, 09h
-	
-	lea		dx, STRINGSAUTO[SI]
-	int		21h
-
-	ret
-
-PALAVRA_A_COMPLETAR3	ENDP
-
+; GERENCIADOR DO TIMER
 
 TEMPO_TIMER	PROC
 	; Mostra qt tempo / 100
-	goto_xy	57,0
+	goto_xy	57,0 ; x = 9, y = 0
 	mov     ah, 09h
 	lea     dx, String_TJ
 	int		21H	
@@ -574,48 +547,171 @@ TEMPO_TIMER	ENDP
 
 ; ---------------------------------------------------------
 
-
 AVATAR	PROC
 
-	START:		
+	Inicio:		
 			mov		ax,0B800h
 			mov		es,ax
 
-			goto_xy	POSx,POSy		; Vai para nova posição
-
+			goto_xy	POSx,POSy		; Vai para nova possição
 			mov 	ah, 08h			; Guarda o Caracter que está na posição do Cursor
 			mov		bh,0			; numero da página
 			int		10h			
-
 			mov		Car, al			; Guarda o Caracter que está na posição do Cursor
-			mov		Cor, ah			; Guarda a cor que está na posição do Cursor
-
+			mov		Cor, ah			; Guarda a cor que está na posição do Cursor	
 			jmp 	CICLO
 
+	; GERENCIADOR DA DETEÇÃO DE PAREDES
 
 	PAREDE:
+			; retorna o filho atrás, já que ele está a ir contra a parede
+			mov		al, POSxa	   
+			mov		POSx, al
+			mov		al, POSya	 
+			mov 	POSy, al
+			jmp 	Inicio
+
+			 
+	; -------------------- LETRAS ---------------------
+
+	; >>>>>>>>>>>>>>>>>>>> NIVEL 1 <<<<<<<<<<<<<<<<<<<<
+
+	ADICIONAR_I:
+	  		goto_xy	10,22
+			MOSTRA	PalavraI
+			goto_xy 38,11 			; Onde está o I no labirinto 1
+			MOSTRA  apaga_letra
 			mov		al, POSxa	    ; Guarda a posicao do cursor
 			mov		POSx, al
 			mov		al, POSya	    ; Guarda a posicao do cursor
 			mov 	POSy, al
+			jmp 	Inicio
 
-			jmp 	START
-	
-	; ADICIONAR:
-	; 		goto_xy	9,22
-	; 		mov     ah, 09h
-	; 		mov		Construir_nome, 'I'
-	; 		lea		ax,	Construir_nome
-	; 		int		21H	
-		
+
+	ADICIONAR_IS:
+	  		goto_xy	10,22
+			MOSTRA	PalavraIS
+			goto_xy 32,5 			; Onde está o S no labirinto 1
+			MOSTRA	apaga_letra
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	Inicio
+
+	ADICIONAR_ISE:
+	  		goto_xy	10,22
+			MOSTRA	PalavraISE
+			goto_xy 75,17			; Onde está o E no labirinto 1
+			MOSTRA	apaga_letra	
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	Inicio
+
+	ADICIONAR_ISEC:
+	  		goto_xy	10,22
+			MOSTRA	PalavraISEC
+			goto_xy 24,19 			; Onde está o C no labirinto 1
+			MOSTRA	apaga_letra
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			call	JOGAR2
+			
+	; >>>>>>>>>>>>>>>>>>>> NIVEL 2 <<<<<<<<<<<<<<<<<<<<
+
+	ADICIONAR_D:
+	  		goto_xy	10,22
+			MOSTRA	PalavraD
+			goto_xy 2,6 			; Onde está o D no labirinto 2
+			MOSTRA	apaga_letra
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	Inicio
+
+	ADICIONAR_DE:
+	  		goto_xy	10,22
+			MOSTRA	PalavraDE
+			goto_xy 63,15 			; Onde está o E no labirinto 2
+			MOSTRA	apaga_letra
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	Inicio
+
+	ADICIONAR_DEI:
+	  		goto_xy	10,22
+			MOSTRA	PalavraDEI
+			goto_xy 2,19 			; Onde está o I no labirinto 2
+			MOSTRA	apaga_letra
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	Inicio
+
+	ADICIONAR_DEIS:
+	  		goto_xy	10,22
+			MOSTRA	PalavraDEIS
+			goto_xy 71,3 			; Onde está o S no labirinto 2
+			MOSTRA	apaga_letra
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	JOGAR3
+
+	; >>>>>>>>>>>>>>>>>>>> NIVEL 3 <<<<<<<<<<<<<<<<<<<<
+
+	ADICIONAR_T:
+	  		goto_xy	10,22
+			MOSTRA	PalavraT
+			goto_xy 45,10 			; Onde está o T no labirinto 3
+			MOSTRA	apaga_letra
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	Inicio
+
+	ADICIONAR_TA:
+	  		goto_xy	10,22
+			MOSTRA	PalavraTA
+			goto_xy 55,17 			; Onde está o A no labirinto 3
+			MOSTRA	apaga_letra
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	Inicio
+
+	ADICIONAR_TAC:
+	  		goto_xy	10,22
+			MOSTRA	PalavraTAC
+			goto_xy 10,15 			; Onde está o C no labirinto 3
+			MOSTRA	apaga_letra
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	GanhouText
+
+	; CICLO
+
 	CICLO:	
 			goto_xy	POSxa,POSya		; Vai para a posição anterior do cursor
-
+			
 			mov		ah, 02h
 			mov		dl, Car			; Repoe Caracter guardado 
 			int		21H		
 		
-			goto_xy	POSx,POSy		; Vai para nova posição
+			goto_xy	POSx,POSy		; Vai para nova possição
 
 			mov 	ah, 08h
 			mov		bh,0			; numero da página
@@ -624,97 +720,71 @@ AVATAR	PROC
 			mov		Car, al			; Guarda o Caracter que está na posição do Cursor
 			mov		Cor, ah			; Guarda a cor que está na posição do Cursor
 			
-			;goto_xy 38,11
-			;MOSTRA wow
-			
 			goto_xy	78,0			; Mostra o caractr que estava na posição do AVATAR
-
 			mov		ah, 02h			; IMPRIME caracter da posição no canto
 			mov		dl, Car	
 			int		21H		
 			
-			; deteção de letras - deprecated
-
-			; cmp		al, 73			;I
-			; je		ADICIONAR
-			
-			; cmp		al, 83			;S
-			
-			; cmp		al, 69			;E
-			
-			; cmp		al, 67			;C
+			; call	Ver_Tecla
 			
 			cmp		al, 177
 			je		PAREDE
 			
-			;goto_xy	POSx,POSy		; Coloca o avatar na posicao do cursor
+			goto_xy	POSx,POSy		; Coloca o avatar na posicao do cursor
 			
-			mov		TEMPVAR3, 0
-			mov		bx, TEMPVAR4
-			mov		TEMPVAR1, bx
 
-	deteta_letras:	
-			mov SI, TEMPVAR1
-			cmp STRINGSAUTO[SI],32
-			je	fim_pal
-			cmp al,STRINGSAUTO[SI]
-			je ConstroiPalavra
-
-	fim_nivel:
-			mov bx, TEMPVAR4
-			mov TEMPVAR1, bx
-			mov SI, TEMPVAR1
-			mov TEMPVAR1,0
-			lea cx, Construir_nome
-
-	fim_pal:
-			;call NIVEL2	
-			jmp fim_nivel
-
-	volta_posicao:
-			goto_xy	POSx,POSy		; Vai para posição do cursor
-			;jmp IMPRIME
-	
-	CicloParaFormarPalavras:	
-			mov bx,cx
-			add bx,TEMPVAR3
-			xor bh,bh
-			xor ah,ah
-			mov al,STRINGSAUTO[SI]
-			cmp [bx],ax
-			jne volta_posicao
-			cmp STRINGSAUTO[SI],32
-			je fim_pal
-			inc TEMPVAR1
-			inc SI
-			jmp CicloParaFormarPalavras
-
-	ConstroiPalavra:		
-			XOR CX,CX
-			add cx,TEMPVAR3
-			mov TEMPVAR2, cl
-
-			lea	cx, Construir_nome
-			mov bx,cx
-			add bx,TEMPVAR3
-			xor bh,bh
-
-			mov [bx],al
-			mov dx, cx
-			mov	ah, 09h	
-			int 21H
-
-			goto_xy	POSx,POSy
-			jmp ret2
-
-	ret2:		
-			inc TEMPVAR1
-			inc TEMPVAR3
-			jmp deteta_letras		
+			cmp 	NIVELATUAL, 49
+			je		PALAVRANIVEL1
 			
+			cmp 	NIVELATUAL, 50
+			je		PALAVRANIVEL2
+
+			cmp 	NIVELATUAL, 51
+			je		PALAVRANIVEL3
+
+	; GERENCIADOR DE PALAVRAS / NIVEL
+
+	PALAVRANIVEL1:		
+			cmp		al, 73			;I
+	 		je		ADICIONAR_I
+			
+	 		cmp		al, 83			;S
+	 		je		ADICIONAR_IS
+			
+	 		cmp		al, 69			;E
+	 		je		ADICIONAR_ISE
+			
+	 		cmp		al, 67			;C
+	 		je		ADICIONAR_ISEC
+
+	PALAVRANIVEL2:		
+			cmp		al, 68			;D
+	 		je		ADICIONAR_D
+			
+	 		cmp		al, 69			;E
+	 		je		ADICIONAR_DE
+			
+	 		cmp		al, 73			;I
+	 		je		ADICIONAR_DEI
+			
+	 		cmp		al, 83			;S
+	 		je		ADICIONAR_DEIS
+
+	PALAVRANIVEL3:		
+			cmp		al, 84			;T
+	 		je		ADICIONAR_T
+			
+	 		cmp		al, 65			;A
+	 		je		ADICIONAR_TA
+			
+	 		cmp		al, 67			;C
+	 		je		ADICIONAR_TAC
+
+	; IMPRIME AVATAR
+
 	IMPRIME:	
             mov		ah, 02h
-			mov		dl, 190         ; Coloca AVATAR
+			mov		dl, 4			; !!! CHAR AVATAR !!!
 			int		21H	
 			goto_xy	POSx,POSy	    ; Vai para posicao do cursor
 			
@@ -723,13 +793,14 @@ AVATAR	PROC
 			mov		al, POSy	    ; Guarda a posicao do cursor
 			mov 	POSya, al
 		
-		
+	; LE INPUT DO TECLADO; SAI COM ESC	
+
 	LER_SETA:
         	call 	LE_TECLA
 			cmp		ah, 1
 			je		ESTEND
-			CMP 	AL, 27	; ESC
-			JE		FIMAVA
+			cmp 	AL, 27		; ESC
+			JE		SAI_PROG
 			jmp		LER_SETA
 		
 	ESTEND:		
@@ -754,23 +825,20 @@ AVATAR	PROC
 			cmp		al,4Dh
 			jne		LER_SETA 
 			inc		POSx		; direita
-			jmp		CICLO
+			jmp		CICLO	
+
+	SAI_PROG:
+			mov  ax, 4c00h
+			int  21h
 
     FIMAVA:		
 			RET
+		
+	FIMTESTE:
+	RET
 
 AVATAR	endp
 
-
-
-IDK	PROC
-
-	
-	mov			ah,4CH 		; FIM DO PROGRAMA
-    
-	INT			21H
-
-IDK	ENDP
 
 
 ; -------------------------------------------
@@ -781,48 +849,101 @@ IDK	ENDP
 
 TOP10	PROC
 
-    	MOV		AX, 0Bh
-		MOV		DS, AX
-	
-		mov		ah, 3ch				; Abrir o ficheiro para escrita
-		mov		cx, 00H				; Define o tipo de ficheiro ??
-		lea		dx, fname			; DX aponta para o nome do ficheiro 
-		int		21h					; Abre efectivamente o ficheiro (AX fica com o Handle do ficheiro)
-		jnc		escreve				; Se não existir erro escreve no ficheiro
-	
-		mov		ah, 09h
-		lea		dx, msgErrorCreate
-		int		21h
-	
-		jmp		fimtop10
+	call apaga_ecra
+	goto_xy	1,1
+	mov		ah, 09h
+	lea     dx,CarrTop10
+    int     21h
 
-    escreve:
+	lefichtop10:
+		;abre ficheiro
+        mov     ah,3dh
+        mov     al,0
+        lea     dx,FichTop10 ; TOP10.TXT
+        int     21h
+        jc      erro_fichtop10
+        mov     HandleFich,ax
+        jmp     ler_top10
 
-		mov		bx, ax				; Coloca em BX o Handle
-    	mov		ah, 40h				; indica que é para escrever
-    	
-		lea		dx, buffer			; DX aponta para a infromação a escrever
-    	mov		cx, 240				; CX fica com o numero de bytes a escrever
-		int		21h					; Chama a rotina de escrita
-		jnc		close				; Se não existir erro na escrita fecha o ficheiro
-	
-		mov		ah, 09h
-		lea		dx, msgErrorWrite
-		int		21h
+	erro_fichtop10:
+        mov     ah,09h
+        lea     dx,Erro_Open
+        int     21h
+        jmp     fimtop10
 
-    close:
+	ler_top10:
+        mov     ah,3fh
+        mov     bx,HandleFich
+        mov     cx,1
+        lea     dx,car_fich
+        int     21h
+		jc		erro_lertop10
+		cmp		ax,0		;EOF?
+		je		fecha_top10
+        mov     ah,02h
+		mov		dl,car_fich
+		int		21h
+		jmp		ler_top10
 
-		mov		ah,3eh				; fecha o ficheiro
-		int		21h
-		jnc		fimtop10
-	
-		mov		ah, 09h
-		lea		dx, msgErrorClose
-		int		21h
+	erro_lertop10:
+        mov     ah,09h
+        lea     dx,Erro_Ler_Msg
+        int     21h
+
+	fecha_top10:
+        mov     ah,3eh
+        mov     bx,HandleFich
+        int     21h
+        jnc     fimtop10
+
+        mov     ah,09h
+        lea     dx,Erro_Close
+        Int     21h
 
     fimtop10:
 
 		call	MenuInicial
+
+; PROCEDIMENTO PARA FAZER O TOP 10 - DEPRECATED
+
+    ; 	MOV		AX, 0Bh
+	; 	MOV		DS, AX
+	
+	; 	mov		ah, 3ch				; Abrir o ficheiro para escrita
+	; 	mov		cx, 00H				; Define o tipo de ficheiro ??
+	; 	lea		dx, fname			; DX aponta para o nome do ficheiro 
+	; 	int		21h					; Abre efectivamente o ficheiro (AX fica com o Handle do ficheiro)
+	; 	jnc		escreve				; Se não existir erro escreve no ficheiro
+	
+	; 	mov		ah, 09h
+	; 	lea		dx, msgErrorCreate
+	; 	int		21h
+	
+	; 	jmp		fimtop10
+
+    ; escreve:
+
+	; 	mov		bx, ax				; Coloca em BX o Handle
+    ; 	mov		ah, 40h				; indica que é para escrever
+    	
+	; 	lea		dx, buffer			; DX aponta para a infromação a escrever
+    ; 	mov		cx, 240				; CX fica com o numero de bytes a escrever
+	; 	int		21h					; Chama a rotina de escrita
+	; 	jnc		close				; Se não existir erro na escrita fecha o ficheiro
+	
+	; 	mov		ah, 09h
+	; 	lea		dx, msgErrorWrite
+	; 	int		21h
+
+    ; close:
+
+	; 	mov		ah,3eh				; fecha o ficheiro
+	; 	int		21h
+	; 	jnc		fimtop10
+	
+	; 	mov		ah, 09h
+	; 	lea		dx, msgErrorClose
+	; 	int		21h
         
 TOP10	endp
 
@@ -834,85 +955,87 @@ TOP10	endp
 
 JOGAR	PROC
 
+	;NIVEL1
 	call		apaga_ecra  ; apaga o ecra
-
 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
-
-    call		IMP_FICH1    ; procedimento que imprime o conteudo do ficheiro
-
-	call		PALAVRA_A_COMPLETAR1
-	
+    call		IMP_FICH1   ; procedimento que imprime o conteudo do ficheiro
+	mov			NIVELATUAL, 49
+	call		PALAVRA_A_COMPLETAR	
 	call		TEMPO_TIMER
-	
 	call 		AVATAR      ; procedimento do avatar
-	
     goto_xy		0,22        ; x = 0; y = 22
-	
-	mov			ah,4CH 		; FIM DO PROGRAMA
-    
-	INT			21H
 
 JOGAR	ENDP
 
 
-; -------------------------------------------
+JOGAR2	PROC
 
-; PROCEDIMENTO DO NIVEL 2
-
-; -------------------------------------------
-
-
-NIVEL2	PROC
-
+	;NIVEL2
 	call		apaga_ecra  ; apaga o ecra
-
 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
-
     call		IMP_FICH2   ; procedimento que imprime o conteudo do ficheiro
-	
-	call		PALAVRA_A_COMPLETAR2
-
+	mov			NIVELATUAL, 50
+	call		PALAVRA_A_COMPLETAR
 	call		TEMPO_TIMER
-	
 	call 		AVATAR      ; procedimento do avatar
-
     goto_xy		0,22        ; x = 0; y = 22
-		
-	mov			ah,4CH
-	
-    INT			21H
 
-NIVEL2	ENDP
+JOGAR2	ENDP
 
 
-; -------------------------------------------
+JOGAR3	PROC
 
-; PROCEDIMENTO DO NIVEL 3
-
-; -------------------------------------------
-
-
-NIVEL3	PROC
-
+	;NIVEL3
 	call		apaga_ecra  ; apaga o ecra
-
 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
-
     call		IMP_FICH3   ; procedimento que imprime o conteudo do ficheiro
-	
-	call		PALAVRA_A_COMPLETAR3
-
+	mov			NIVELATUAL, 51
+	call		PALAVRA_A_COMPLETAR
 	call		TEMPO_TIMER
-	
 	call 		AVATAR      ; procedimento do avatar
-
     goto_xy		0,22        ; x = 0; y = 22
-		
-	mov			ah,4CH
-	
-    INT			21H
 
-NIVEL3 ENDP
+	;call		GanhouText	; DEPRECATED - VITORIA > JOGAR 3
+
+	;mov		ah,4CH 		; DEPRECATED - FIM DO PROGRAMA
+	;INT		21H			; ^^
+
+JOGAR3	ENDP
+
+
+; Quando acaba o lvl 3
+
+GanhouText PROC
+
+	call	apaga_ecra  ; apaga o ecra	
+	goto_xy		0,5
+	mov		ah, 09h
+	lea		dx, FINALGANHO
+	int		21h
+
+	call		MenuInicial
+	ret
+
+GanhouText ENDP
+
+
+; Quando esgota o tempo
+
+PerdeuText PROC
+
+	call	apaga_ecra  ; apaga o ecra	
+	mov		Tempo_j, -1
+	goto_xy	0,5
+	mov		ah, 09h
+	lea		dx, FINALPERDEU
+	int		21h
+
+	call	MenuInicial
+	ret
+
+PerdeuText ENDP
+
+
 
 ; ------------------------------------------------------------------
 
@@ -923,16 +1046,14 @@ NIVEL3 ENDP
 
 INSTRUCOES	PROC
 
-	goto_xy		0,0
+	goto_xy		0,2
     ;call        apaga_ecra
     lea         dx, Ajuda ; mostra a ajuda
     mov         ah, 9
     INT			21H
 	
 	call		MenuInicial
-	
 	ret
-	
 
 INSTRUCOES	ENDP
 
@@ -945,150 +1066,145 @@ INSTRUCOES	ENDP
 
 Ler_TEMPO PROC	
  
-		PUSH AX
-		PUSH BX
-		PUSH CX
-		PUSH DX
+	PUSH AX
+	PUSH BX
+	PUSH CX
+	PUSH DX
+
+	PUSHF
 	
-		PUSHF
-		
-		MOV AH, 2CH             ; Buscar a hORAS
-		INT 21H                 
-		
-		XOR AX,AX
-		MOV AL, DH              ; segundos para al
-		mov Segundos, AX		; guarda segundos na variavel correspondente
-		
-		XOR AX,AX
-		MOV AL, CL              ; Minutos para al
-		mov Minutos, AX         ; guarda MINUTOS na variavel correspondente
-		
-		XOR AX,AX
-		MOV AL, CH              ; Horas para al
-		mov Horas,AX			; guarda HORAS na variavel correspondente
- 
-		POPF
-		POP DX
-		POP CX
-		POP BX
-		POP AX
- 		RET 
+	MOV AH, 2CH             ; Buscar a hORAS
+	INT 21H                 
+	
+	XOR AX,AX
+	MOV AL, DH              ; segundos para al
+	mov Segundos, AX		; guarda segundos na variavel correspondente
+	
+	XOR AX,AX
+	MOV AL, CL              ; Minutos para al
+	mov Minutos, AX         ; guarda MINUTOS na variavel correspondente
+	
+	XOR AX,AX
+	MOV AL, CH              ; Horas para al
+	mov Horas,AX			; guarda HORAS na variavel correspondente
+
+	POPF
+	POP DX
+	POP CX
+	POP BX
+	POP AX
+	RET 
 		
 Ler_TEMPO   ENDP 
 
 
 Trata_Horas PROC
 
-		PUSHF
-		PUSH AX
-		PUSH BX
-		PUSH CX
-		PUSH DX		
+	PUSHF
+	PUSH AX
+	PUSH BX
+	PUSH CX
+	PUSH DX		
 
-		call 	Ler_TEMPO			; Horas, minutos e segundos do Sistema
-		
-		MOV		AX, Segundos
-		cmp		AX, Old_seg			; Verifica se os segundos mudaram desde a ultima leitura
-		je		fim_horas			; Se a hora não mudou desde a última leitura sai.
-		mov		Old_seg, AX			; Se segundos são diferentes actualiza informação do tempo 
-		
-		
-
-	    
-		inc 	Tempo_j
-		mov		ax, Tempo_j		
-		MOV	bl, 10     
-		div 	bl
-		add 	al, 30h				; Caracter Correspondente às dezenas
-		add	ah,	30h
-		
-		mov		cx, ax
-	;	mov		Tempo_j, ax
+	call 	Ler_TEMPO			; Horas, minutos e segundos do Sistema
 	
-		
-		
-		MOV 	STR10[0],al			
-		MOV 	STR10[1],ah
-		MOV 	STR10[2],'$'
-		GOTO_XY 59,0
-		MOSTRA STR10 	
-		
-		
-		mov 	ax,Horas
-		MOV		bl, 10     
-		div 	bl
-		add 	al, 30h				; Caracter Correspondente às dezenas
-		add		ah,	30h				; Caracter Correspondente às unidades
+	MOV		AX, Segundos
+	cmp		AX, Old_seg			; Verifica se os segundos mudaram desde a ultima leitura
+	je		fim_horas			; Se a hora não mudou desde a última leitura sai.
+	mov		Old_seg, AX			; Se segundos são diferentes actualiza informação do tempo 
 	
-		MOV 	STR12[0],al			
-		MOV 	STR12[1],ah
-		MOV 	STR12[2],'h'
-		MOV 	STR12[3],'$'
-		GOTO_XY 1,0
-		MOSTRA STR12 	
+	inc 	Tempo_j
+	mov		ax, Tempo_j
+	mov		cx, Tempo_j
+	
+	MOV		bl, 10     
+	div 	bl
+	add 	al, 30h				; Caracter Correspondente às dezenas
+	add		ah,	30h
+	
+	; mov	cx, ax
+	; mov	Tempo_j, ax		
+	
+	MOV 	STR10[0],al			
+	MOV 	STR10[1],ah
+	MOV 	STR10[2],'$'
+	GOTO_XY	59,0
+	MOSTRA	STR10 	
+	
+	; QUANDO ACABA O JOGO
 
+	cmp		Tempo_j, 99 ; 99 PORQUE O JOGO COMEÇA NO 0
+	je		tenso
+	
+	; HORAS
 
-		mov 	ax,Minutos
-		MOV 	bl, 10     
-		div 	bl
-		add 	al, 30h				; Caracter Correspondente às dezenas
-		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			 
-		MOV 	STR12[1],ah
-		MOV 	STR12[2],'m'		
-		MOV 	STR12[3],'$'
-		GOTO_XY	5,0
-		MOSTRA	STR12 		
-		
-		
-		mov 	ax,Segundos
-		MOV 	bl, 10     
-		div 	bl
-		add 	al, 30h				; Caracter Correspondente às dezenas
-		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			 
-		MOV 	STR12[1],ah
-		MOV 	STR12[2],'s'		
-		MOV 	STR12[3],'$'
-		GOTO_XY	9,0
-		MOSTRA	STR12 		
-        	
-		
+	mov 	ax,Horas
+	MOV		bl, 10     
+	div 	bl
+	add 	al, 30h				; Caracter Correspondente às dezenas
+	add		ah,	30h				; Caracter Correspondente às unidades
+
+	MOV 	STR12[0],al			
+	MOV 	STR12[1],ah
+	MOV 	STR12[2],'h'
+	MOV 	STR12[3],'$'
+	GOTO_XY 1,0
+	MOSTRA	STR12 	
+
+	; MINUTOS
+
+	mov 	ax,Minutos
+	MOV 	bl, 10     
+	div 	bl
+	add 	al, 30h				; Caracter Correspondente às dezenas
+	add		ah,	30h				; Caracter Correspondente às unidades
+	MOV 	STR12[0],al			 
+	MOV 	STR12[1],ah
+	MOV 	STR12[2],'m'		
+	MOV 	STR12[3],'$'
+	GOTO_XY	5,0
+	MOSTRA	STR12 		
+	
+	; SEGUNDOS
+
+	mov 	ax,Segundos
+	MOV 	bl, 10     
+	div 	bl
+	add 	al, 30h				; Caracter Correspondente às dezenas
+	add		ah,	30h				; Caracter Correspondente às unidades
+	MOV 	STR12[0],al			 
+	MOV 	STR12[1],ah
+	MOV 	STR12[2],'s'		
+	MOV 	STR12[3],'$'
+	GOTO_XY	9,0
+	MOSTRA	STR12 
+
+	; a testar os fins	
+	
 	fimhoras:
-		
 		POPF
-		
 		POP		DX		
-		POP 	CX
-		POP 	BX
-		POP 	AX
+		POP		CX
+		POP		BX
+		POP		AX
 		RET		
-
 		MOV		AH,4Ch
 		INT		21h
-		
-		
+				
 	fim_horas:		
 		goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
 		
 		POPF
-
 		POP DX		
 		POP CX
 		POP BX
 		POP AX
-		
 		RET		
 
-	; a testar os fins	
+	; QUANDO PERDE	
+
 	tenso:	
-		mov  ax, 4c00h
-		int  21h	
-		
-		
-		cmp		cx, '10'
-		je		tenso
-		
+		call	PerdeuText
 			
 Trata_Horas ENDP
 
@@ -1098,8 +1214,8 @@ Trata_Horas ENDP
 
 MostraMenu	proc
 
-	goto_xy   0,0
-	lea  dx,  MenuOptions
+	goto_xy   0,3
+	lea  dx,  MenuOptions ; menu inic
 	mov  ah,  9
 	int  21h
 	ret
@@ -1113,40 +1229,50 @@ MostraMenu	endp
 Le_Tecla_Menu	PROC
 
 	nao_ha:	
-			mov		ah,0bh
-			int		21h
-			cmp		al,0
-			je		nao_ha
+		mov		ah,0bh
+		int		21h
+		cmp		al,0
+		je		nao_ha ;loop
 
-			mov		ah,08h
-			int		21h
-			mov		ah,0
-			cmp		al,0
-			jne		sucesso
+		mov		ah,08h
+		int		21h
+		mov		ah,0
+		cmp		al,0
+		jne		sucesso
 
-			mov		ah, 08h
-			int		21h
-			mov		ah,1
+		mov		ah, 08h
+		int		21h
+		mov		ah,1
 			
 	sucesso:	;sai do loop
-			RET
+		RET
 
 Le_Tecla_Menu	endp
 
+; ------------------------------------------------------------------
+
+; Dá as boas vindas
+
+BoasVindas proc
+
+	goto_xy 0,20
+	mov		ah, 09h
+	lea		dx, Bem_Vindo ; mostra o texto de boas vindas ate ao utilizador clicar em qualquer tecla
+	int		21h
+
+BoasVindas endp
 
 ; TRATA DO MENU DO PROGRAMA
 
 MenuInicial	proc	
 
-	mov		ah, 09h
-	lea		dx, Bem_Vindo
-	int		21h
+	loopMenu: 
 
-	loopMenu: call	Le_Tecla_Menu
+		call	Le_Tecla_Menu
 
-		call		apaga_ecra  ; apaga o ecra
+		call	apaga_ecra  ; apaga o ecra
 
-		call        MostraMenu ; imprime o menu no ecra
+		call    MostraMenu ; imprime o menu no ecra
 
 		mov ah, 1h
 		int 21h	
@@ -1161,9 +1287,12 @@ MenuInicial	proc
 		je		OPCINSTRUCOES
 		cmp		al, 52 ; 4
 		je		OPCSAIR
+		cmp		al, 27 ; ESC
+		je		OPCSAIR
 		jmp     loopMenu ; jump -> volta a tentar
 		
-		
+		; switch
+
 		OPCJOGAR:
 			
 			call    JOGAR	
@@ -1206,6 +1335,8 @@ Main	proc
 
     call		apaga_ecra		; apaga o ecra
 
+	call		BoasVindas
+
 	call		MenuInicial		; trata do programa
 
 Main	endp 					; fim do main
@@ -1213,9 +1344,6 @@ Main	endp 					; fim do main
 Cseg	ends 					; fim do segmento de codigo
 
 end		Main 					; fim do programa
-
-
-
 
 
 
@@ -1307,3 +1435,208 @@ end		Main 					; fim do programa
     ;     ret
 	;
 	; -----------------------------------
+
+	; TESTES AVATAR
+
+	; PROCEDIMENTOS PARA AUTOMAÇÃO
+
+	; deteta_letras:	
+	; 		mov SI, TEMPVAR1
+	; 		cmp STRINGSAUTO[SI],32
+	; 		je	fim_pal
+	; 		cmp al,STRINGSAUTO[SI]
+	; 		je ADC_LETRA
+
+	; fim_nivel:
+	; 		mov bx, TEMPVAR4
+	; 		mov TEMPVAR1, bx
+	; 		mov SI, TEMPVAR1
+	; 		mov TEMPVAR1,0
+	; 		lea cx, Construir_nome
+
+	; fim_pal:
+	; 		call NIVEL2	
+	; 		jmp fim_nivel
+	
+	; ADC_LETRA:		
+	; 		XOR CX,CX
+	; 		add cx,TEMPVAR3
+	; 		mov TEMPVAR2, cl
+
+	; 		lea	cx, Construir_nome
+	; 		mov bx,cx
+	; 		add bx,TEMPVAR3
+	; 		xor bh,bh
+
+	; 		mov [bx],al
+	; 		mov dx, cx
+	; 		mov	ah, 09h	
+	; 		int 21H
+
+	; 		goto_xy	POSx,POSy
+	; 		jmp ret2
+
+	; ret2:		
+	; 		inc TEMPVAR1
+	; 		inc TEMPVAR3
+	; 		jmp deteta_letras
+	
+
+	; -------------------------------------------
+	
+	; CODIGO USADO PARA AUTOMATIZAR PALAVRAS
+
+; ------------- MODO AUTOMATICO ------------
+
+; PROCEDIMENTO PARA CALCULAR UMA PALAVRA ALEATORIA
+
+; PalavRandom proc near
+
+; 			mov ah, 0
+; 			int 1ah
+; 			mov ax,dx
+; 			mov dx,0
+; 			mov bx, STRINGCHARS
+; 			div bx
+; 			mov TEMPVAR4,dx
+; 			ret
+
+; PalavRandom endp
+
+
+; PALAVRA_A_COMPLETAR1	PROC
+	
+; 	call	PalavRandom
+; 	mov		ax, TEMPVAR4
+; 	xor		bx,bx
+; 	mov		bx, 10
+; 	mul		bx
+; 	mov		SI, ax
+; 	mov		TEMPVAR4, SI
+
+; 	mov		ah, 09h
+	
+; 	lea		dx, STRINGSAUTO[SI]
+; 	int		21h
+
+; 	ret
+
+; PALAVRA_A_COMPLETAR1	ENDP
+
+; PALAVRA_A_COMPLETAR2	PROC
+	
+; 	call	PalavRandom
+; 	mov		ax, TEMPVAR4
+; 	xor		bx,bx
+; 	mov		bx, 10
+; 	mul		bx
+; 	mov		SI, ax
+; 	mov		TEMPVAR4, SI
+
+; 	mov		ah, 09h
+	
+; 	lea		dx, STRINGSAUTO[SI]
+; 	int		21h
+
+; 	ret
+
+; PALAVRA_A_COMPLETAR2	ENDP
+
+; PALAVRA_A_COMPLETAR3	PROC
+	
+; 	call	PalavRandom
+; 	mov		ax, TEMPVAR4
+; 	xor		bx,bx
+; 	mov		bx, 10
+; 	mul		bx
+; 	mov		SI, ax
+; 	mov		TEMPVAR4, SI
+
+; 	mov		ah, 09h
+	
+; 	lea		dx, STRINGSAUTO[SI]
+; 	int		21h
+
+; 	ret
+
+; PALAVRA_A_COMPLETAR3	ENDP
+
+	
+	
+; deprecated vars -> main CICLO
+
+	; mov		TEMPVAR3, 0
+	; mov		bx, TEMPVAR4
+	; mov		TEMPVAR1, bx
+
+
+
+; NIVEIS ANTIGOS - DEPRECATED
+
+
+; -------------------------------------------
+
+; PROCEDIMENTO DO NIVEL 2
+
+; -------------------------------------------
+
+
+; NIVEL2	PROC
+
+; 	call		apaga_ecra  ; apaga o ecra
+
+; 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
+
+;     call		IMP_FICH2   ; procedimento que imprime o conteudo do ficheiro
+	
+; 	;call		PALAVRA_A_COMPLETAR2
+
+; 	call		TEMPO_TIMER
+	
+; 	;mov			NIVELATUAL, 50
+
+; 	call 		AVATAR    ; procedimento do avatar
+
+;     goto_xy		0,22        ; x = 0; y = 22
+
+; 	; call		NIVEL3
+
+; 	mov			ah,4CH
+	
+;     INT			21H
+
+; NIVEL2	ENDP
+
+
+; ; -------------------------------------------
+
+; ; PROCEDIMENTO DO NIVEL 3
+
+; ; -------------------------------------------
+
+
+; NIVEL3	PROC
+
+; 	call		apaga_ecra  ; apaga o ecra
+
+; 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
+
+;     call		IMP_FICH3   ; procedimento que imprime o conteudo do ficheiro
+	
+; 	;call		PALAVRA_A_COMPLETAR3
+
+; 	call		TEMPO_TIMER
+
+; 	;mov			NIVELATUAL, 51
+	
+; 	call 		AVATAR      ; procedimento do avatar
+
+;     goto_xy		0,22        ; x = 0; y = 22
+
+; 	call		GanhouText
+		
+; 	mov			ah,4CH
+	
+;     INT			21H
+
+; NIVEL3 ENDP
