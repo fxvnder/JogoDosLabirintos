@@ -1710,7 +1710,7 @@ Trata_Horas PROC
 	; QUANDO ACABA O JOGO
 
 	cmp		Tempo_j, 99 ; 99 PORQUE O JOGO COMEÇA NO -1
-	;je		tenso
+	je		tenso
 	
 	; HORAS
 
@@ -1906,8 +1906,6 @@ Main	proc
 		
 	mov			ax,0B800h
 	mov			es,ax
-
-	; call		MovsIniciais	; inicia o programa - deprecated
 
     call		apaga_ecra		; apaga o ecra
 
