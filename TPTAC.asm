@@ -19,22 +19,24 @@
 .model small
 .stack 2048
 
+; PILHA
+
+PILHA	SEGMENT PARA STACK 'STACK'
+		db 2048 dup(?)
+PILHA	ENDS
+
 ; ---------------------------------------------------------
 
 ; DADOS E VARIAVEIS A USAR
 
 ; ---------------------------------------------------------
 
-PILHA	SEGMENT PARA STACK 'STACK'
-		db 2048 dup(?)
-PILHA	ENDS
-
-
 dseg	segment para public 'data' ; segmento de codigo "D"
 
         UserInputMenu   dw  ?
 
 		; MENU INICIAL
+		
         MenuOptions db "                                                          ",13,10
 					db "                    **************************************",13,10
 					db "                    *                                    *",13,10
@@ -73,10 +75,18 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 					db "                    **************************************",13,10
 					db "                                                          ",13,10
 					db "                                                          ",13,10,'$'
-        
+
+		; TEXTO BEM VINDO
+
+		Bem_Vindo	db "Bem-Vindo ao Jogo do Labirinto! Have fun ;) $"
+
 		; VARIAVEIS ETC.
         
-		;Parede			db		"177"
+		;Parede			db		"177" ; deprecated
+		TEMPVAR1		dw		0
+		TEMPVAR2		db		0
+		TEMPVAR3		dw		1
+		TEMPVAR4		dw		0
 		STR12	 		DB 		"            "	; String para 12 digitos
 		STR10			DB		"          "
 		DDMMAAAA 		db		"                     "
@@ -96,9 +106,20 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		; PALAVRAS
 
 		String_num 		db 		"  0 $"
+
+		; strings manuais p/ficheiro
+
         String_Fich1  	db	    "ISEC  $"	
 		String_Fich2  	db	    "ISEC  $"	
 		String_Fich3  	db	    "ISEC  $"	
+
+		; strings auto
+
+		STRINGCHARS		dw		4
+		STRINGSAUTO		db		"ISEC  $"
+						db		"DEIS  $"
+						db		"MASM  $"
+
 		Construir_nome	db	    "            $"	
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
@@ -145,10 +166,10 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		
 		
 		; Horas
-		NUM_SP		db		"                    $" 	; PAra apagar zona de ecran
+		NUM_SP		db		"                    $" 	; Para apagar zona de ecra
 
 
-		;testes do café
+		; testes do café
 		wow		db	    " $"
 		
 dseg	ends ; fim do segmento "D"
@@ -428,28 +449,113 @@ IMP_FICH3	endp
 ; ------------------------------------------------------------------
 ; ------------------------------------------------------------------
 
+; PROCS. PARA A PALAVRA A COMPLETAR NO JOGO
+
+; ------- MODO MANUAL - DEPRECATED ---------
+
+; PALAVRA_A_COMPLETAR1	PROC
+; 	; Palavra a procurar
+; 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 1
+; 	mov     ah, 09h
+; 	lea     dx, String_Fich1
+; 	int		21H	
+; PALAVRA_A_COMPLETAR1	ENDP
+
+; PALAVRA_A_COMPLETAR2	PROC
+; 	; Palavra a procurar
+; 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
+; 	mov     ah, 09h
+; 	lea     dx, String_Fich2
+; 	int		21H	
+; PALAVRA_A_COMPLETAR2	ENDP
+
+; PALAVRA_A_COMPLETAR3	PROC
+; 	; Palavra a procurar
+; 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
+; 	mov     ah, 09h
+; 	lea     dx, String_Fich3
+; 	int		21H	
+; PALAVRA_A_COMPLETAR3	ENDP
+
+; ------------- MODO AUTOMATICO ------------
+
+; PROCEDIMENTO PARA CALCULAR UMA PALAVRA ALEATORIA
+
+PalavRandom proc
+
+			mov ah, 0
+			int 1ah
+			mov ax,dx
+			mov dx,0
+			mov bx, STRINGCHARS
+			div bx
+			mov TEMPVAR4,dx
+			ret
+
+PalavRandom endp
+
+
 PALAVRA_A_COMPLETAR1	PROC
-	; Palavra a procurar
-	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 1
-	mov     ah, 09h
-	lea     dx, String_Fich1
-	int		21H	
+	
+	goto_xy	11,20
+
+	call	PalavRandom ; vai pedir uma palavra aleatoria ao proc
+	mov		ax, TEMPVAR4
+	xor		bx,bx
+	mov		bx, 10
+	mul		bx
+	mov		SI, ax
+	mov		TEMPVAR4, SI
+
+	mov		ah, 09h
+	
+	lea		dx, STRINGSAUTO[SI] ; mostra a palavra escolhida
+	int		21h
+
+	ret
+
 PALAVRA_A_COMPLETAR1	ENDP
 
 PALAVRA_A_COMPLETAR2	PROC
-	; Palavra a procurar
-	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
-	mov     ah, 09h
-	lea     dx, String_Fich2
-	int		21H	
+	
+	goto_xy	11,20
+
+	call	PalavRandom
+	mov		ax, TEMPVAR4
+	xor		bx,bx
+	mov		bx, 10
+	mul		bx
+	mov		SI, ax
+	mov		TEMPVAR4, SI
+
+	mov		ah, 09h
+	
+	lea		dx, STRINGSAUTO[SI]
+	int		21h
+
+	ret
+
 PALAVRA_A_COMPLETAR2	ENDP
 
 PALAVRA_A_COMPLETAR3	PROC
-	; Palavra a procurar
-	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
-	mov     ah, 09h
-	lea     dx, String_Fich3
-	int		21H	
+	
+	goto_xy	11,20
+
+	call	PalavRandom
+	mov		ax, TEMPVAR4
+	xor		bx,bx
+	mov		bx, 10
+	mul		bx
+	mov		SI, ax
+	mov		TEMPVAR4, SI
+
+	mov		ah, 09h
+	
+	lea		dx, STRINGSAUTO[SI]
+	int		21h
+
+	ret
+
 PALAVRA_A_COMPLETAR3	ENDP
 
 
@@ -471,16 +577,19 @@ TEMPO_TIMER	ENDP
 
 AVATAR	PROC
 
-	Inicio:		
+	START:		
 			mov		ax,0B800h
 			mov		es,ax
 
-			goto_xy	POSx,POSy		; Vai para nova possição
+			goto_xy	POSx,POSy		; Vai para nova posição
+
 			mov 	ah, 08h			; Guarda o Caracter que está na posição do Cursor
 			mov		bh,0			; numero da página
 			int		10h			
+
 			mov		Car, al			; Guarda o Caracter que está na posição do Cursor
-			mov		Cor, ah			; Guarda a cor que está na posição do Cursor	
+			mov		Cor, ah			; Guarda a cor que está na posição do Cursor
+
 			jmp 	CICLO
 
 
@@ -489,27 +598,29 @@ AVATAR	PROC
 			mov		POSx, al
 			mov		al, POSya	    ; Guarda a posicao do cursor
 			mov 	POSy, al
-			jmp 	Inicio
+
+			jmp 	START
 	
-
-
-	ADICIONAR:
-			goto_xy	9,22
-			mov     ah, 09h
-			mov	Construir_nome, 'I'
-			lea	ax,	Construir_nome
-			int		21H	
+	; ADICIONAR:
+	; 		goto_xy	9,22
+	; 		mov     ah, 09h
+	; 		mov		Construir_nome, 'I'
+	; 		lea		ax,	Construir_nome
+	; 		int		21H	
 		
 	CICLO:	
 			goto_xy	POSxa,POSya		; Vai para a posição anterior do cursor
+
 			mov		ah, 02h
 			mov		dl, Car			; Repoe Caracter guardado 
 			int		21H		
 		
-			goto_xy	POSx,POSy		; Vai para nova possição
+			goto_xy	POSx,POSy		; Vai para nova posição
+
 			mov 	ah, 08h
 			mov		bh,0			; numero da página
 			int		10h		
+
 			mov		Car, al			; Guarda o Caracter que está na posição do Cursor
 			mov		Cor, ah			; Guarda a cor que está na posição do Cursor
 			
@@ -517,27 +628,89 @@ AVATAR	PROC
 			;MOSTRA wow
 			
 			goto_xy	78,0			; Mostra o caractr que estava na posição do AVATAR
+
 			mov		ah, 02h			; IMPRIME caracter da posição no canto
 			mov		dl, Car	
 			int		21H		
 			
-			cmp		al, 73			;I
-			je		ADICIONAR
+			; deteção de letras - deprecated
+
+			; cmp		al, 73			;I
+			; je		ADICIONAR
 			
-			cmp		al, 83			;S
+			; cmp		al, 83			;S
 			
-			cmp		al, 69			;E
+			; cmp		al, 69			;E
 			
-			cmp		al, 67			;C
+			; cmp		al, 67			;C
 			
 			cmp		al, 177
 			je		PAREDE
 			
-			goto_xy	POSx,POSy		; Coloca o avatar na posicao do cursor
+			;goto_xy	POSx,POSy		; Coloca o avatar na posicao do cursor
 			
-		
+			mov		TEMPVAR3, 0
+			mov		bx, TEMPVAR4
+			mov		TEMPVAR1, bx
+
+	deteta_letras:	
+			mov SI, TEMPVAR1
+			cmp STRINGSAUTO[SI],32
+			je	fim_pal
+			cmp al,STRINGSAUTO[SI]
+			je ConstroiPalavra
+
+	fim_nivel:
+			mov bx, TEMPVAR4
+			mov TEMPVAR1, bx
+			mov SI, TEMPVAR1
+			mov TEMPVAR1,0
+			lea cx, Construir_nome
+
+	fim_pal:
+			;call NIVEL2	
+			jmp fim_nivel
+
+	volta_posicao:
+			goto_xy	POSx,POSy		; Vai para posição do cursor
+			;jmp IMPRIME
 	
-		
+	CicloParaFormarPalavras:	
+			mov bx,cx
+			add bx,TEMPVAR3
+			xor bh,bh
+			xor ah,ah
+			mov al,STRINGSAUTO[SI]
+			cmp [bx],ax
+			jne volta_posicao
+			cmp STRINGSAUTO[SI],32
+			je fim_pal
+			inc TEMPVAR1
+			inc SI
+			jmp CicloParaFormarPalavras
+
+	ConstroiPalavra:		
+			XOR CX,CX
+			add cx,TEMPVAR3
+			mov TEMPVAR2, cl
+
+			lea	cx, Construir_nome
+			mov bx,cx
+			add bx,TEMPVAR3
+			xor bh,bh
+
+			mov [bx],al
+			mov dx, cx
+			mov	ah, 09h	
+			int 21H
+
+			goto_xy	POSx,POSy
+			jmp ret2
+
+	ret2:		
+			inc TEMPVAR1
+			inc TEMPVAR3
+			jmp deteta_letras		
 			
 	IMPRIME:	
             mov		ah, 02h
@@ -649,8 +822,7 @@ TOP10	PROC
 
     fimtop10:
 
-		MOV		AH,4CH
-		INT		21H
+		call	MenuInicial
         
 TOP10	endp
 
@@ -757,7 +929,7 @@ INSTRUCOES	PROC
     mov         ah, 9
     INT			21H
 	
-	;call main
+	call		MenuInicial
 	
 	ret
 	
@@ -883,26 +1055,31 @@ Trata_Horas PROC
         	
 		
 	fimhoras:
+		
 		POPF
-		POP DX		
-		POP CX
-		POP BX
-		POP AX
+		
+		POP		DX		
+		POP 	CX
+		POP 	BX
+		POP 	AX
 		RET		
-		MOV			AH,4Ch
-		INT			21h
+
+		MOV		AH,4Ch
+		INT		21h
 		
 		
 	fim_horas:		
 		goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
 		
 		POPF
+
 		POP DX		
 		POP CX
 		POP BX
 		POP AX
-		RET		
 		
+		RET		
+
 	; a testar os fins	
 	tenso:	
 		mov  ax, 4c00h
@@ -929,47 +1106,80 @@ MostraMenu	proc
 	
 MostraMenu	endp
 
+; ------------------------------------------------------------------
+
+; LE A TECLA NO MENU INICIAL
+
+Le_Tecla_Menu	PROC
+
+	nao_ha:	
+			mov		ah,0bh
+			int		21h
+			cmp		al,0
+			je		nao_ha
+
+			mov		ah,08h
+			int		21h
+			mov		ah,0
+			cmp		al,0
+			jne		sucesso
+
+			mov		ah, 08h
+			int		21h
+			mov		ah,1
+			
+	sucesso:	;sai do loop
+			RET
+
+Le_Tecla_Menu	endp
+
 
 ; TRATA DO MENU DO PROGRAMA
 
-MenuInicial	proc
+MenuInicial	proc	
 
-	call		apaga_ecra  ; apaga o ecra
+	mov		ah, 09h
+	lea		dx, Bem_Vindo
+	int		21h
 
-	call        MostraMenu ; imprime o menu no ecra
+	loopMenu: call	Le_Tecla_Menu
 
-	mov ah, 1h
-	int 21h	
+		call		apaga_ecra  ; apaga o ecra
 
-	; chama o procedimento conforme a tecla pressionada
-	
-	cmp 	al, 49 ; 1
-	je		OPCJOGAR
-	cmp		al, 50 ; 2
-    je		OPCTOP10
-	cmp		al, 51 ; 3
-    je		OPCINSTRUCOES
-	cmp		al, 52 ; 4
-	je		OPCSAIR
-	jmp     OPCSAIR ; jump -> sair
-	
-	
-OPCJOGAR:
-	
-	call    JOGAR	
-    
-OPCTOP10:
+		call        MostraMenu ; imprime o menu no ecra
 
-    call    TOP10
-	
-OPCINSTRUCOES:
+		mov ah, 1h
+		int 21h	
 
-    call    INSTRUCOES 
-	
-OPCSAIR:	
-	
-	mov  ax, 4c00h
-    int  21h
+		; chama o procedimento conforme a tecla pressionada
+		
+		cmp 	al, 49 ; 1
+		je		OPCJOGAR
+		cmp		al, 50 ; 2
+		je		OPCTOP10
+		cmp		al, 51 ; 3
+		je		OPCINSTRUCOES
+		cmp		al, 52 ; 4
+		je		OPCSAIR
+		jmp     loopMenu ; jump -> volta a tentar
+		
+		
+		OPCJOGAR:
+			
+			call    JOGAR	
+			
+		OPCTOP10:
+
+			call    TOP10
+			
+		OPCINSTRUCOES:
+
+			call    INSTRUCOES 
+			
+		OPCSAIR:	
+			
+			mov  ax, 4c00h
+			int  21h
 
 
 MenuInicial	endp
@@ -992,10 +1202,10 @@ Main	proc
 	mov			ax,0B800h
 	mov			es,ax
 
-	; call		MovsIniciais	; inicia o programa
-	
+	; call		MovsIniciais	; inicia o programa - deprecated
+
     call		apaga_ecra		; apaga o ecra
-    
+
 	call		MenuInicial		; trata do programa
 
 Main	endp 					; fim do main
