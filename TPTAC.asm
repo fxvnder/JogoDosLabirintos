@@ -97,7 +97,7 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 				db "                    **************************************",13,10
 				db "                    *                                    *",13,10
 				db "                    *                                    *",13,10
-				db "                    *      Perdeu - Esgotou o tempo      *",13,10
+				db "                    *      	    Acabou o tempo!          *",13,10
 				db "                    *                                    *",13,10
 				db "                    *                                    *",13,10
 				db "                    **************************************",13,10
@@ -143,6 +143,8 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 	PontosLvl1		dw		100
 	PontosLvl2		dw		200
 	PontosLvl3		dw		300
+	PontosLvl4		dw		400
+	PontosLvl5		dw		500
 
 	PontosFinais	dw		0
 
@@ -167,6 +169,9 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 	String_Inic  	db	    "ISEC  $"	
 	String_Lvl2  	db	    "DEIS  $"	
 	String_Lvl3  	db	    "TAC   $"	
+	String_Lvl4  	db	    "ASM   $"	
+	String_Lvl5  	db	    "TP    $"	
+
 
 	; strings automaticas - deprecated
 
@@ -174,6 +179,8 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 	;STRINGSAUTO	db		"ISEC  $"
 	;				db		"DEIS  $"
 	;				db		"TAC   $"
+	;				db		"ASM   $"
+	;				db		"TP    $"
 
 	; strings usadas para outputs
 
@@ -189,6 +196,11 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 	PalavraT		db	    "T           $"	
 	PalavraTA		db	    "TA          $"	
 	PalavraTAC		db	    "TAC         $"	
+	PalavraA		db		"A           $"
+	PalavraAS		db		"AS          $"
+	PalavraASM		db		"ASM         $"
+	PalavraT2		db		"T           $"
+	PalavraTP		db		"TP          $"
 
 	Dim_nome		dw		5	; Comprimento do Nome
 	indice_nome		dw		0	; indice que aponta para Construir_nome
@@ -206,6 +218,8 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 	Fich1         	db      'LAB1.TXT',0
 	Fich2         	db      'LAB2.TXT',0
 	Fich3         	db      'LAB3.TXT',0
+	Fich4         	db      'LAB4.TXT',0
+	Fich5         	db      'LAB5.TXT',0
 	FichTop10		db		'TOP10.TXT',0
 	HandleFich      dw      0
 	car_fich        db      ?
@@ -500,6 +514,124 @@ sai_f3:
 	
 IMP_FICH3	endp		
 
+; -------------------------------------------
+; IMP_FICH4 - ABRE E GERE FICHEIRO DO NIVEL 4
+; -------------------------------------------
+
+IMP_FICH4	PROC
+
+	;abre ficheiro
+
+	mov     ah,3dh
+	mov     al,0
+
+	; FICHEIRO = LABIRINTO 4
+
+	lea     dx,Fich4
+	int     21h
+	jc      erro_abrir4
+	mov     HandleFich,ax
+	jmp     ler_ciclo4
+
+erro_abrir4:
+	mov     ah,09h
+	lea     dx,Erro_Open
+	int     21h
+	jmp     sai_f4
+
+ler_ciclo4:
+	mov     ah,3fh
+	mov     bx,HandleFich
+	mov     cx,1
+	lea     dx,car_fich
+	int     21h
+	jc		erro_ler3
+	cmp		ax,0		;EOF?
+	je		fecha_ficheiro4
+	mov     ah,02h
+	mov		dl,car_fich
+	int		21h
+	jmp		ler_ciclo4
+
+erro_ler4:
+	mov     ah,09h
+	lea     dx,Erro_Ler_Msg
+	int     21h
+
+fecha_ficheiro4:
+	mov     ah,3eh
+	mov     bx,HandleFich
+	int     21h
+	jnc     sai_f4
+
+	mov     ah,09h
+	lea     dx,Erro_Close
+	Int     21h
+
+sai_f4:	
+	RET
+	
+IMP_FICH4	endp		
+
+; -------------------------------------------
+; IMP_FICH5 - ABRE E GERE FICHEIRO DO NIVEL 5
+; -------------------------------------------
+
+IMP_FICH5	PROC
+
+	;abre ficheiro
+
+	mov     ah,3dh
+	mov     al,0
+
+	; FICHEIRO = LABIRINTO 5
+
+	lea     dx,Fich5
+	int     21h
+	jc      erro_abrir5
+	mov     HandleFich,ax
+	jmp     ler_ciclo5
+
+erro_abrir5:
+	mov     ah,09h
+	lea     dx,Erro_Open
+	int     21h
+	jmp     sai_f5
+
+ler_ciclo5:
+	mov     ah,3fh
+	mov     bx,HandleFich
+	mov     cx,1
+	lea     dx,car_fich
+	int     21h
+	jc		erro_ler5
+	cmp		ax,0		;EOF?
+	je		fecha_ficheiro5
+	mov     ah,02h
+	mov		dl,car_fich
+	int		21h
+	jmp		ler_ciclo5
+
+erro_ler5:
+	mov     ah,09h
+	lea     dx,Erro_Ler_Msg
+	int     21h
+
+fecha_ficheiro5:
+	mov     ah,3eh
+	mov     bx,HandleFich
+	int     21h
+	jnc     sai_f5
+
+	mov     ah,09h
+	lea     dx,Erro_Close
+	Int     21h
+
+sai_f5:	
+	RET
+	
+IMP_FICH5	endp		
+
 ; ------------------------------------------------------------------
 ; ------------------------------------------------------------------
 ; ------------------------------------------------------------------
@@ -536,6 +668,23 @@ PALAVRA_A_COMPLETAR	PROC
 		int		21H	
 		jmp		FIM
 
+	PALAVRALABI4:
+		; Palavra a procurar
+		goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
+		mov     ah, 09h
+		lea     dx, String_Lvl4 ; ASM
+		int		21H	
+		jmp		FIM
+
+	PALAVRALABI5:
+		; Palavra a procurar
+		goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
+		mov     ah, 09h
+		lea     dx, String_Lvl5 ; TP
+		int		21H	
+		jmp		FIM
+
+
 	VERIFICANIVEL:
 		cmp 	NIVELATUAL, 49 ; 1
 		je		PALAVRALABI1
@@ -545,6 +694,13 @@ PALAVRA_A_COMPLETAR	PROC
 
 		cmp 	NIVELATUAL, 51 ; 3
 		je		PALAVRALABI3
+		
+		cmp 	NIVELATUAL, 52 ; 4
+		je		PALAVRALABI4
+		
+		cmp 	NIVELATUAL, 53 ; 5
+		je		PALAVRALABI5
+		
 
 	FIM:	
 		RET
@@ -847,12 +1003,134 @@ AVATAR	PROC
 		mov		POSx, al
 		mov		al, POSya	    ; Guarda a posicao do cursor
 		mov 	POSy, al
+		jmp 	JOGAR4
+
+
+	; >>>>>>>>>>>>>>>>>>>> NIVEL 4 <<<<<<<<<<<<<<<<<<<<
+
+
+	ADICIONAR_A:
+		cmp		progressoC, 49
+		je		SEGUE_A
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_A:
+		goto_xy	10,22
+		MOSTRA	PalavraA
+		;goto_xy 45,10 			; Onde está o T no labirinto 3
+		;MOSTRA	apaga_letra
+		mov		progressoC, 50	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
+
+
+
+	ADICIONAR_AS:
+		cmp		progressoC, 50
+		je		SEGUE_AS
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_AS:
+		goto_xy	10,22
+		MOSTRA	PalavraAS
+		;goto_xy 55,17 			; Onde está o A no labirinto 3
+		;MOSTRA	apaga_letra
+		mov		progressoC, 51	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
+
+
+
+	ADICIONAR_ASM:
+		cmp		progressoC, 51
+		je		SEGUE_TAC
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_ASM:
+		goto_xy	10,22
+		MOSTRA	PalavraASM
+		;goto_xy 10,15 			; Onde está o C no labirinto 3
+		;MOSTRA	apaga_letra
+
+		mov		progressoC, 52	; ProgressoNaPalavra +1
+		
+		; calcula pontuacao
+
+		mov		PontosLvl4, ax
+		sub		ax, Tempo_j
+		mov		PontosFinais, bx
+		add		Tempo_j, bx
+		mov		bx, PontosFinais
+
+		; segue para o nivel seguinte
+
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	JOGAR5
+
+
+	; >>>>>>>>>>>>>>>>>>>> NIVEL 5 <<<<<<<<<<<<<<<<<<<<
+
+
+	ADICIONAR_T2:
+		cmp		progressoC, 49
+		je		SEGUE_T2
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_T2:
+		goto_xy	10,22
+		MOSTRA	PalavraT2
+		;goto_xy 45,10 			; Onde está o T no labirinto 3
+		;MOSTRA	apaga_letra
+		mov		progressoC, 50	; ProgressoNaPalavra +1
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp 	Inicio
+
+
+
+	ADICIONAR_TP:
+		cmp		progressoC, 50
+		je		SEGUE_TP
+		jmp		RESETA_PROGRESSO
+
+	SEGUE_TP:
+		goto_xy	10,22
+		MOSTRA	PalavraTP
+		;goto_xy 10,15 			; Onde está o C no labirinto 3
+		;MOSTRA	apaga_letra
+
+		mov		progressoC, 51	; ProgressoNaPalavra +1
+		
+		; calcula pontuacao
+
+		mov		PontosLvl5, ax
+		sub		ax, Tempo_j
+		mov		PontosFinais, bx
+		add		Tempo_j, bx
+		mov		bx, PontosFinais
+
+		; segue para o nivel seguinte
+
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
 		jmp 	GanhouText
 
 
 
 	; RESETA O PROGRESSO NA PALAVRA
-
 
 
 	RESETA_PROGRESSO:
@@ -877,6 +1155,16 @@ AVATAR	PROC
 
 		cmp		NIVELATUAL, 51 	; LVL 3
 		je		RESETA_LVL3
+
+		; LVL 4
+
+		cmp		NIVELATUAL, 52 	; LVL 4
+		je		RESETA_LVL4
+
+		; LVL 5
+
+		cmp		NIVELATUAL, 53 	; LVL 5
+		je		RESETA_LVL5
 
 
 	RESETA_LVL1:
@@ -906,6 +1194,26 @@ AVATAR	PROC
 		mov		al, POSya	    ; Guarda a posicao do cursor
 		mov 	POSy, al
 		jmp		JOGAR3			; RECOMEÇA O NIVEL
+
+	RESETA_LVL4:
+
+		goto_xy	10,22
+		MOSTRA	Construir_nome	; RESETA O PROGRESSO
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp		JOGAR4			; RECOMEÇA O NIVEL
+
+	RESETA_LVL5:
+
+		goto_xy	10,22
+		MOSTRA	Construir_nome	; RESETA O PROGRESSO
+		mov		al, POSxa	    ; Guarda a posicao do cursor
+		mov		POSx, al
+		mov		al, POSya	    ; Guarda a posicao do cursor
+		mov 	POSy, al
+		jmp		JOGAR5			; RECOMEÇA O NIVEL
 
 	; CICLO
 
@@ -948,6 +1256,12 @@ AVATAR	PROC
 		cmp 	NIVELATUAL, 51
 		je		PALAVRANIVEL3
 
+		cmp 	NIVELATUAL, 52
+		je		PALAVRANIVEL4
+
+		cmp 	NIVELATUAL, 53
+		je		PALAVRANIVEL5
+
 	; GERENCIADOR DE PALAVRAS / NIVEL
 
 	PALAVRANIVEL1:		
@@ -986,6 +1300,23 @@ AVATAR	PROC
 		
 		cmp		al, 67			;C
 		je		ADICIONAR_TAC
+
+	PALAVRANIVEL4:		
+		cmp		al, 65			;A
+		je		ADICIONAR_A
+		
+		cmp		al, 83			;S
+		je		ADICIONAR_AS
+		
+		cmp		al, 77			;M
+		je		ADICIONAR_ASM
+
+	PALAVRANIVEL5:		
+		cmp		al, 84			;T
+		je		ADICIONAR_T
+		
+		cmp		al, 80			;P
+		je		ADICIONAR_TP
 
 	; IMPRIME AVATAR
 
@@ -1205,15 +1536,45 @@ JOGAR3	PROC
 	call 		AVATAR      ; procedimento do avatar
     goto_xy		0,22        ; x = 0; y = 22
 
+JOGAR3	ENDP
+
+JOGAR4	PROC
+
+	;NIVEL4
+	call		apaga_ecra  ; apaga o ecra
+	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
+    call		IMP_FICH4   ; procedimento que imprime o conteudo do ficheiro
+	mov			NIVELATUAL, 52 ; LVL 4
+	mov			progressoC, 49 ; PROG 1
+	call		PALAVRA_A_COMPLETAR
+	call		TEMPO_TIMER
+	call 		AVATAR      ; procedimento do avatar
+    goto_xy		0,22        ; x = 0; y = 22
+
+JOGAR4	ENDP
+
+JOGAR5	PROC
+
+	;NIVEL5
+	call		apaga_ecra  ; apaga o ecra
+	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
+    call		IMP_FICH5   ; procedimento que imprime o conteudo do ficheiro
+	mov			NIVELATUAL, 53 ; LVL 5
+	mov			progressoC, 49 ; PROG 1
+	call		PALAVRA_A_COMPLETAR
+	call		TEMPO_TIMER
+	call 		AVATAR      ; procedimento do avatar
+    goto_xy		0,22        ; x = 0; y = 22
+
 	;call		GanhouText	; DEPRECATED - VITORIA > JOGAR 3
 
 	;mov		ah,4CH 		; DEPRECATED - FIM DO PROGRAMA
 	;INT		21H			; ^^
 
-JOGAR3	ENDP
+JOGAR5	ENDP
 
 
-; Quando acaba o lvl 3
+; Quando acaba o lvl 5
 
 GanhouText PROC
 
@@ -1345,7 +1706,7 @@ Trata_Horas PROC
 	
 	; QUANDO ACABA O JOGO
 
-	cmp		Tempo_j, 99 ; 99 PORQUE O JOGO COMEÇA NO 0
+	cmp		Tempo_j, 99 ; 99 PORQUE O JOGO COMEÇA NO -1
 	je		tenso
 	
 	; HORAS
