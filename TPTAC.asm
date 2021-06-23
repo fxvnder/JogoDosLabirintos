@@ -15,10 +15,18 @@
 .model small
 .stack 2048
 
+; DADOS E VARIAVEIS A USAR
 
 dseg	segment para public 'data'
 
+        UserInputMenu   dw  ?
 
+        MenuOptions db "ISEC - Trabalho Pratico de TAC",13,10
+                    db "1. Jogar",13,10
+                    db "2. Top 10",13,10
+                    db "3. Sair",13,10,'$'
+        
+        
 		STR12	 		DB 		"            "	; String para 12 digitos
 		DDMMAAAA 		db		"                     "
 		
@@ -265,51 +273,53 @@ AVATAR		endp
 
 ; Criar ficheiro
 
+; TOP 10
+
 TOP10	PROC
 
-    	MOV		AX, DADOS
-		MOV		DS, AX
+    	;MOV		AX, DADOS
+		;MOV		DS, AX
 	
-		mov		ah, 3ch				; Abrir o ficheiro para escrita
-		mov		cx, 00H				; Define o tipo de ficheiro ??
-		lea		dx, fname			; DX aponta para o nome do ficheiro 
-		int		21h					; Abre efectivamente o ficheiro (AX fica com o Handle do ficheiro)
-		jnc		escreve				; Se não existir erro escreve no ficheiro
+		;mov		ah, 3ch				; Abrir o ficheiro para escrita
+		;mov		cx, 00H				; Define o tipo de ficheiro ??
+		;lea		dx, fname			; DX aponta para o nome do ficheiro 
+		;int		21h					; Abre efectivamente o ficheiro (AX fica com o Handle do ficheiro)
+		;jnc		escreve				; Se não existir erro escreve no ficheiro
 	
-		mov		ah, 09h
-		lea		dx, msgErrorCreate
-		int		21h
+		;mov		ah, 09h
+		;lea		dx, msgErrorCreate
+		;int		21h
 	
-		jmp		fim
+		;jmp		fim
 
-    escreve:
+    ;escreve:
 
-		mov		bx, ax				; Coloca em BX o Handle
-    	mov		ah, 40h				; indica que é para escrever
+		;mov		bx, ax				; Coloca em BX o Handle
+    	;mov		ah, 40h				; indica que é para escrever
     	
-		lea		dx, buffer			; DX aponta para a infromação a escrever
-    	mov		cx, 240				; CX fica com o numero de bytes a escrever
-		int		21h					; Chama a rotina de escrita
-		jnc		close				; Se não existir erro na escrita fecha o ficheiro
+		;lea		dx, buffer			; DX aponta para a infromação a escrever
+    	;mov		cx, 240				; CX fica com o numero de bytes a escrever
+		;int		21h					; Chama a rotina de escrita
+		;jnc		close				; Se não existir erro na escrita fecha o ficheiro
 	
-		mov		ah, 09h
-		lea		dx, msgErrorWrite
-		int		21h
+		;mov		ah, 09h
+		;lea		dx, msgErrorWrite
+		;int		21h
 
-    close:
+    ;close:
 
-		mov		ah,3eh				; fecha o ficheiro
-		int		21h
-		jnc		fim
+		;mov		ah,3eh				; fecha o ficheiro
+		;int		21h
+		;jnc		fim
 	
-		mov		ah, 09h
-		lea		dx, msgErrorClose
-		int		21h
+		;mov		ah, 09h
+		;lea		dx, msgErrorClose
+		;int		21h
 
-    fim:
+    ;fim:
 
-		MOV		AH,4CH
-		INT		21H
+		;MOV		AH,4CH
+		;INT		21H
         
 TOP10	endp
 
@@ -337,6 +347,15 @@ JOGAR ENDP
 
 ; 177 = ASCII CODE DAS BORDAS DO LABIRINTO
 
+; MOSTRA O MENU
+
+MostraMenu proc
+  lea  dx, MenuOptions
+  mov  ah, 9
+  int  21h
+  ret
+MostraMenu endp
+
 
 ; MAIN
 
@@ -348,53 +367,86 @@ Main  proc
 		
 	mov			ax,0B800h
 	mov			es,ax
-
+	
     call		apaga_ecra  ; apaga o ecra
-
-    push    rbp
-    mov     rbp, rsp
-    sub     rsp, 16
-
-    switch:
     
-        ; OBTEM CARACTER DO USER
+    call        MostraMenu ; imprime o menu no ecra
 
-        MOV AH, 1   ; le caracter do utilizador
-        INT 21H
-        
-        movsx   eax, BYTE PTR [rbp-1]
-        cmp     eax, 51
-        je      .L5
-        cmp     eax, 51
-        jg      .L6
-        cmp     eax, 49
-        je      .L7
-        cmp     eax, 50
-        je      .L8
-        jmp     switch
+    mov         ah, 7
+    int         21h
+    cmp         ah, 7
+    je          OPCJOGAR
 
+OPCJOGAR:		
 
-.L7: ; JOGAR
+    cmp 	al, 31
+    jne		OPCTOP10
+    call    JOGAR
+    
+OPCTOP10:
 
-    mov     eax, 0
-    call    jogar
-
-.L8: ; TOP 10
-
-    mov     eax, 0
+    cmp		al, 32
+    jne		OPCSAIR
     call    TOP10
 
-.L5: ; SAIR
+OPCSAIR:
+    ; sair
+    
+    mov  ax, 4c00h
+    int  21h
+    
+    
+    ; codigo para usar o switch nao funcional
+    
+    ;push    rbp
+    ;mov     rbp, rsp
+    ;sub     rsp, 16
 
-    mov     eax, 0
-    leave
-    ret
+    ; call    ReadInt
+    ; mov     UserInputMenu, eax
+        
+    ; switch nao funcional.
+    ;     switch:
+    ;     
+    ;         MOV AH, 1   ; le caracter do utilizador
+    ;         INT 21H
+    ;         
+    ;         movsx   eax, BYTE PTR [rbp-1]
+    ;         cmp     eax, 51
+    ;         je      .L5
+    ;         cmp     eax, 51
+    ;         jg      .L6
+    ;         cmp     eax, 49
+    ;         je      .L7
+    ;         cmp     eax, 50
+    ;         je      .L8
+    ;         jmp     switch
+    ; 
+    ; 
+    ; .L7: ; JOGAR
+    ; 
+    ;     mov     eax, 0
+    ;     call    jogar
+    ; 
+    ; .L8: ; TOP 10
+    ; 
+    ;     mov     eax, 0
+    ;     call    TOP10
+    ; 
+    ; .L5: ; SAIR
+    ; 
+    ;     mov     eax, 0
+    ;     leave
+    ;     ret
+    ; 
+    ; .L6: ; SAI DO SWITCH
+    ; 
+    ;     mov     eax, 0
+    ;     leave
+    ;     ret
+    ;     
 
-.L6: ; SAI DO SWITCH
 
-    mov     eax, 0
-    leave
-    ret
 
 
 Main    endp
