@@ -76,13 +76,14 @@ dseg	segment para public 'data' ; segmento de codigo "D"
         
 		; VARIAVEIS ETC.
         
+		;Parede			db		"177"
 		STR12	 		DB 		"            "	; String para 12 digitos
 		STR10			DB		"          "
 		DDMMAAAA 		db		"                     "
 		
 		; CONTADOR
 
-		timer			dw 		'0' 				; Contador de tempo
+		timer			dw 		'0'				; Contador de tempo
 		Horas			dw		0				; Vai guardar a hora atual
 		Minutos			dw		0				; Vai guardar os minutos actuais
 		Segundos		dw		0				; Vai guardar os segundos actuais
@@ -145,14 +146,22 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		
 		; Horas
 		NUM_SP		db		"                    $" 	; PAra apagar zona de ecran
-		
+
+
+		;testes do café
+		wow		db	    " $"
 		
 dseg	ends ; fim do segmento "D"
 
+; ---------------------------------------------------------
 
 cseg	segment para public 'code' ; segmento "C" comeca
 
 assume		cs:cseg, ds:dseg, ss:pilha
+
+; ------------------------------------------------------------------
+
+; MACROS
 
 ; macro para manusear posicoes no ecra "X,Y"
 
@@ -175,6 +184,8 @@ MOSTRA MACRO STR
 	INT 21H
 
 ENDM
+
+; ------------------------------------------------------------------
 
 ; PROCEDIMENTO PARA LER UMA TECLA	
 
@@ -299,53 +310,53 @@ IMP_FICH2	PROC
 		; FICHEIRO = LABIRINTO 2
         lea     dx,Fich2
         int     21h
-        jc      erro_abrir
+        jc      erro_abrir2
         mov     HandleFich,ax
-        jmp     ler_ciclo
+        jmp     ler_ciclo2
 
-erro_abrir:
+erro_abrir2:
         mov     ah,09h
         lea     dx,Erro_Open
         int     21h
-        jmp     sai_f
+        jmp     sai_f2
 
-ler_ciclo:
+ler_ciclo2:
         mov     ah,3fh
         mov     bx,HandleFich
         mov     cx,1
         lea     dx,car_fich
         int     21h
-		jc		erro_ler
+		jc		erro_ler2
 		cmp		ax,0		;EOF?
-		je		fecha_ficheiro
+		je		fecha_ficheiro2
         mov     ah,02h
 		mov		dl,car_fich
 		int		21h
-		jmp		ler_ciclo
+		jmp		ler_ciclo2
 
-erro_ler:
+erro_ler2:
         mov     ah,09h
         lea     dx,Erro_Ler_Msg
         int     21h
 
-fecha_ficheiro:
+fecha_ficheiro2:
         mov     ah,3eh
         mov     bx,HandleFich
         int     21h
-        jnc     sai_f
+        jnc     sai_f2
 
         mov     ah,09h
         lea     dx,Erro_Close
         Int     21h
 
-imprime_palavra:				;por concluir
+imprime_palavra2:				;por concluir
 		goto_xy 22,11
 		mov     ah,09h
         lea     dx,String_Fich2
         int     21h
-        jnc     sai_f
+        jnc     sai_f2
 
-sai_f:	
+sai_f2:	
 		RET
 		
 IMP_FICH2	endp		
@@ -362,60 +373,60 @@ IMP_FICH3	PROC
 		; FICHEIRO = LABIRINTO 3
         lea     dx,Fich3
         int     21h
-        jc      erro_abrir
+        jc      erro_abrir3
         mov     HandleFich,ax
-        jmp     ler_ciclo
+        jmp     ler_ciclo3
 
-erro_abrir:
+erro_abrir3:
         mov     ah,09h
         lea     dx,Erro_Open
         int     21h
-        jmp     sai_f
+        jmp     sai_f3
 
-ler_ciclo:
+ler_ciclo3:
         mov     ah,3fh
         mov     bx,HandleFich
         mov     cx,1
         lea     dx,car_fich
         int     21h
-		jc		erro_ler
+		jc		erro_ler3
 		cmp		ax,0		;EOF?
-		je		fecha_ficheiro
+		je		fecha_ficheiro3
         mov     ah,02h
 		mov		dl,car_fich
 		int		21h
-		jmp		ler_ciclo
+		jmp		ler_ciclo3
 
-erro_ler:
+erro_ler3:
         mov     ah,09h
         lea     dx,Erro_Ler_Msg
         int     21h
 
-fecha_ficheiro:
+fecha_ficheiro3:
         mov     ah,3eh
         mov     bx,HandleFich
         int     21h
-        jnc     sai_f
+        jnc     sai_f3
 
         mov     ah,09h
         lea     dx,Erro_Close
         Int     21h
 
-imprime_palavra:				;por concluir
+imprime_palavra3:				;por concluir
 		goto_xy 22,11
 		mov     ah,09h
         lea     dx,String_Fich3
         int     21h
-        jnc     sai_f
+        jnc     sai_f3
 
-sai_f:	
+sai_f3:	
 		RET
 		
 IMP_FICH3	endp		
 
-; ---------------------------------------------------------
-; ---------------------------------------------------------
-; ---------------------------------------------------------
+; ------------------------------------------------------------------
+; ------------------------------------------------------------------
+; ------------------------------------------------------------------
 
 PALAVRA_A_COMPLETAR1	PROC
 	; Palavra a procurar
@@ -429,7 +440,7 @@ PALAVRA_A_COMPLETAR2	PROC
 	; Palavra a procurar
 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
 	mov     ah, 09h
-	lea     dx, String_Fich1
+	lea     dx, String_Fich2
 	int		21H	
 PALAVRA_A_COMPLETAR2	ENDP
 
@@ -437,21 +448,18 @@ PALAVRA_A_COMPLETAR3	PROC
 	; Palavra a procurar
 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
 	mov     ah, 09h
-	lea     dx, String_Fich1
+	lea     dx, String_Fich3
 	int		21H	
 PALAVRA_A_COMPLETAR3	ENDP
 
 
-; ---------------------------------------------------------
-
 TEMPO_TIMER	PROC
 	; Mostra qt tempo / 100
-	goto_xy	57,0			
+	goto_xy	57,0
 	mov     ah, 09h
 	lea     dx, String_TJ
 	int		21H	
 TEMPO_TIMER	ENDP
-
 
 
 ; ---------------------------------------------------------
@@ -460,107 +468,136 @@ TEMPO_TIMER	ENDP
 
 ; ---------------------------------------------------------
 
+
 AVATAR	PROC
 
+	Inicio:		
 			mov		ax,0B800h
 			mov		es,ax
 
-			goto_xy	POSx,POSy		; Vai para nova posicao
-			mov 	ah, 08h         ; Guarda o Caracter que esta na posicao do Cursor
-			mov		bh,0			; numero da pagina
+			goto_xy	POSx,POSy		; Vai para nova possição
+			mov 	ah, 08h			; Guarda o Caracter que está na posição do Cursor
+			mov		bh,0			; numero da página
 			int		10h			
-			mov		Car, al			; Guarda o Caracter que esta na posicao do Cursor
-			mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor					
-			
-			;cmp 	Car, 177
-			;je		REINICIAR
-			
-			
-		CICLO:		  
-			
-            goto_xy	POSxa,POSya		; Vai para a posicao anterior do cursor
+			mov		Car, al			; Guarda o Caracter que está na posição do Cursor
+			mov		Cor, ah			; Guarda a cor que está na posição do Cursor	
+			jmp 	CICLO
+
+
+	PAREDE:
+			mov		al, POSxa	    ; Guarda a posicao do cursor
+			mov		POSx, al
+			mov		al, POSya	    ; Guarda a posicao do cursor
+			mov 	POSy, al
+			jmp 	Inicio
+	
+
+
+	ADICIONAR:
+			goto_xy	9,22
+			mov     ah, 09h
+			mov	Construir_nome, 'I'
+			lea	ax,	Construir_nome
+			int		21H	
+		
+	CICLO:	
+			goto_xy	POSxa,POSya		; Vai para a posição anterior do cursor
 			mov		ah, 02h
 			mov		dl, Car			; Repoe Caracter guardado 
 			int		21H		
 		
-			goto_xy	POSx,POSy		; Vai para nova posicao
+			goto_xy	POSx,POSy		; Vai para nova possição
 			mov 	ah, 08h
-			mov		bh,0			; numero da pagina
+			mov		bh,0			; numero da página
 			int		10h		
-			mov		Car, al			; Guarda o Caracter que esta na posicao do Cursor
-			mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor
+			mov		Car, al			; Guarda o Caracter que está na posição do Cursor
+			mov		Cor, ah			; Guarda a cor que está na posição do Cursor
 			
-			; Imprime caracter onde o avatar se encontra
-			goto_xy	78,0			; Mostra o caracter que estava na posicao do AVATAR
-			mov		ah, 02h			; IMPRIME caracter da posicao no canto
+			;goto_xy 38,11
+			;MOSTRA wow
+			
+			goto_xy	78,0			; Mostra o caractr que estava na posição do AVATAR
+			mov		ah, 02h			; IMPRIME caracter da posição no canto
 			mov		dl, Car	
-			int		21H			
-	
-			goto_xy	POSx,POSy		; Vai para posicao do cursor
+			int		21H		
+			
+			cmp		al, 73			;I
+			je		ADICIONAR
+			
+			cmp		al, 83			;S
+			
+			cmp		al, 69			;E
+			
+			cmp		al, 67			;C
+			
+			cmp		al, 177
+			je		PAREDE
+			
+			goto_xy	POSx,POSy		; Coloca o avatar na posicao do cursor
+			
 		
-
-		;REINICIAR:
-		;	goto_xy	POSxa,POSya	
-		;	mov		ah, 02h
-		;	mov		dl, Car			; Repoe Caracter guardado 
-		;	int		21H		
+	
+		
 			
-			
-        IMPRIME:	
-
+	IMPRIME:	
             mov		ah, 02h
 			mov		dl, 190         ; Coloca AVATAR
 			int		21H	
 			goto_xy	POSx,POSy	    ; Vai para posicao do cursor
-		
+			
 			mov		al, POSx	    ; Guarda a posicao do cursor
 			mov		POSxa, al
 			mov		al, POSy	    ; Guarda a posicao do cursor
 			mov 	POSya, al
 		
-        LER_SETA:
-
+		
+	LER_SETA:
         	call 	LE_TECLA
 			cmp		ah, 1
 			je		ESTEND
 			CMP 	AL, 27	; ESC
-			JE		FIM
+			JE		FIMAVA
 			jmp		LER_SETA
 		
-        ESTEND:		
-
+	ESTEND:		
             cmp 	al,48h
 			jne		BAIXO
 			dec		POSy		; cima
 			jmp		CICLO
 
-        BAIXO:
-
+    BAIXO:
     		cmp		al,50h
 			jne		ESQUERDA
 			inc 	POSy		; baixo
 			jmp		CICLO
 
-        ESQUERDA:
-
+    ESQUERDA:
 			cmp		al,4Bh
 			jne		DIREITA
 			dec		POSx		; esquerda
 			jmp		CICLO
 
-        DIREITA:
-
+	DIREITA:
 			cmp		al,4Dh
 			jne		LER_SETA 
 			inc		POSx		; direita
 			jmp		CICLO
 
-        fim:		
-
+    FIMAVA:		
 			RET
 
 AVATAR	endp
 
+
+
+IDK	PROC
+
+	
+	mov			ah,4CH 		; FIM DO PROGRAMA
+    
+	INT			21H
+
+IDK	ENDP
 
 
 ; -------------------------------------------
@@ -571,7 +608,7 @@ AVATAR	endp
 
 TOP10	PROC
 
-    	MOV		AX, 0B800h
+    	MOV		AX, 0Bh
 		MOV		DS, AX
 	
 		mov		ah, 3ch				; Abrir o ficheiro para escrita
@@ -584,7 +621,7 @@ TOP10	PROC
 		lea		dx, msgErrorCreate
 		int		21h
 	
-		jmp		fim
+		jmp		fimtop10
 
     escreve:
 
@@ -604,13 +641,13 @@ TOP10	PROC
 
 		mov		ah,3eh				; fecha o ficheiro
 		int		21h
-		jnc		fim
+		jnc		fimtop10
 	
 		mov		ah, 09h
 		lea		dx, msgErrorClose
 		int		21h
 
-    fim:
+    fimtop10:
 
 		MOV		AH,4CH
 		INT		21H
@@ -705,12 +742,11 @@ NIVEL3	PROC
 
 NIVEL3 ENDP
 
-
-; -------------------------------------------
+; ------------------------------------------------------------------
 
 ; PROC. INSTRUCOES
 
-; -------------------------------------------
+; ------------------------------------------------------------------
 
 
 INSTRUCOES	PROC
@@ -720,18 +756,20 @@ INSTRUCOES	PROC
     lea         dx, Ajuda ; mostra a ajuda
     mov         ah, 9
     INT			21H
+	
+	;call main
+	
 	ret
+	
 
 INSTRUCOES	ENDP
 
-
-
-; ----------------------------------------------------------------------------------
-; ----------------------------------------------------------------------------------
+; ------------------------------------------------------------------
+; ------------------------------------------------------------------
 ; HORAS - Le Hora DO SISTEMA E COLOCA em tres variaveis (Horas, Minutos, Segundos)
 ; CH - Horas, CL - Minutos, DH - Segundos
-; ----------------------------------------------------------------------------------
-; ----------------------------------------------------------------------------------
+; ------------------------------------------------------------------
+; ------------------------------------------------------------------
 
 Ler_TEMPO PROC	
  
@@ -767,7 +805,6 @@ Ler_TEMPO PROC
 Ler_TEMPO   ENDP 
 
 
-;--------------------------------
 Trata_Horas PROC
 
 		PUSHF
@@ -784,20 +821,19 @@ Trata_Horas PROC
 		mov		Old_seg, AX			; Se segundos são diferentes actualiza informação do tempo 
 		
 		
-		mov		dx, timer
-		
-		cmp     dx, '100'
-		je		fim_se_for_igual
-		
-		add		dx, 1
-	    mov		timer, dx
-	
 
-		mov		ax, timer
-		;MOV	    bl, 10     
-		;div 	bl
-		;add 	al, 30h				
-		;add		ah,	30h
+	    
+		inc 	Tempo_j
+		mov		ax, Tempo_j		
+		MOV	bl, 10     
+		div 	bl
+		add 	al, 30h				; Caracter Correspondente às dezenas
+		add	ah,	30h
+		
+		mov		cx, ax
+	;	mov		Tempo_j, ax
+	
+		
 		
 		MOV 	STR10[0],al			
 		MOV 	STR10[1],ah
@@ -844,10 +880,9 @@ Trata_Horas PROC
 		MOV 	STR12[3],'$'
 		GOTO_XY	9,0
 		MOSTRA	STR12 		
-        
+        	
 		
-	fim_se_for_igual:
-		
+	fimhoras:
 		POPF
 		POP DX		
 		POP CX
@@ -856,7 +891,8 @@ Trata_Horas PROC
 		RET		
 		MOV			AH,4Ch
 		INT			21h
-						
+		
+		
 	fim_horas:		
 		goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
 		
@@ -866,15 +902,23 @@ Trata_Horas PROC
 		POP BX
 		POP AX
 		RET		
+		
+	; a testar os fins	
+	tenso:	
+		mov  ax, 4c00h
+		int  21h	
+		
+		
+		cmp		cx, '10'
+		je		tenso
+		
 			
 Trata_Horas ENDP
 
-
-
-
-;--------------------------------------------------------------------------
+; ------------------------------------------------------------------
 
 ; IMPRIME O MENU INICIAL
+
 MostraMenu	proc
 
 	goto_xy   0,0
@@ -887,6 +931,7 @@ MostraMenu	endp
 
 
 ; TRATA DO MENU DO PROGRAMA
+
 MenuInicial	proc
 
 	call		apaga_ecra  ; apaga o ecra
@@ -897,6 +942,7 @@ MenuInicial	proc
 	int 21h	
 
 	; chama o procedimento conforme a tecla pressionada
+	
 	cmp 	al, 49 ; 1
 	je		OPCJOGAR
 	cmp		al, 50 ; 2
@@ -925,13 +971,18 @@ OPCSAIR:
 	mov  ax, 4c00h
     int  21h
 
+
 MenuInicial	endp
 
-; -------------------------------------------
 
-; ------------------ MAIN -------------------
 
-; -------------------------------------------
+; ------------------------------------------------------------------
+
+; ---------------------------- MAIN --------------------------------
+
+; ------------------------------------------------------------------
+
+
 
 Main	proc
 
