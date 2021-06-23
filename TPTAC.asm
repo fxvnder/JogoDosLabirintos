@@ -324,49 +324,49 @@ AVATAR		endp
 
 TOP10	PROC
 
-    	;MOV		AX, DADOS
-		;MOV		DS, AX
+    	MOV		AX, 0B800h
+		MOV		DS, AX
 	
-		;mov		ah, 3ch				; Abrir o ficheiro para escrita
-		;mov		cx, 00H				; Define o tipo de ficheiro ??
-		;lea		dx, fname			; DX aponta para o nome do ficheiro 
-		;int		21h					; Abre efectivamente o ficheiro (AX fica com o Handle do ficheiro)
-		;jnc		escreve				; Se não existir erro escreve no ficheiro
+		mov		ah, 3ch				; Abrir o ficheiro para escrita
+		mov		cx, 00H				; Define o tipo de ficheiro ??
+		lea		dx, fname			; DX aponta para o nome do ficheiro 
+		int		21h					; Abre efectivamente o ficheiro (AX fica com o Handle do ficheiro)
+		jnc		escreve				; Se não existir erro escreve no ficheiro
 	
-		;mov		ah, 09h
-		;lea		dx, msgErrorCreate
-		;int		21h
+		mov		ah, 09h
+		lea		dx, msgErrorCreate
+		int		21h
 	
-		;jmp		fim
+		jmp		fim
 
-    ;escreve:
+    escreve:
 
-		;mov		bx, ax				; Coloca em BX o Handle
-    	;mov		ah, 40h				; indica que é para escrever
+		mov		bx, ax				; Coloca em BX o Handle
+    	mov		ah, 40h				; indica que é para escrever
     	
-		;lea		dx, buffer			; DX aponta para a infromação a escrever
-    	;mov		cx, 240				; CX fica com o numero de bytes a escrever
-		;int		21h					; Chama a rotina de escrita
-		;jnc		close				; Se não existir erro na escrita fecha o ficheiro
+		lea		dx, buffer			; DX aponta para a infromação a escrever
+    	mov		cx, 240				; CX fica com o numero de bytes a escrever
+		int		21h					; Chama a rotina de escrita
+		jnc		close				; Se não existir erro na escrita fecha o ficheiro
 	
-		;mov		ah, 09h
-		;lea		dx, msgErrorWrite
-		;int		21h
+		mov		ah, 09h
+		lea		dx, msgErrorWrite
+		int		21h
 
-    ;close:
+    close:
 
-		;mov		ah,3eh				; fecha o ficheiro
-		;int		21h
-		;jnc		fim
+		mov		ah,3eh				; fecha o ficheiro
+		int		21h
+		jnc		fim
 	
-		;mov		ah, 09h
-		;lea		dx, msgErrorClose
-		;int		21h
+		mov		ah, 09h
+		lea		dx, msgErrorClose
+		int		21h
 
-    ;fim:
+    fim:
 
-		;MOV		AH,4CH
-		;INT		21H
+		MOV		AH,4CH
+		INT		21H
         
 TOP10	endp
 
@@ -401,11 +401,12 @@ JOGAR ENDP
 
 INSTRUCOES   PROC
 
-    call        apaga_ecra
+	goto_xy   0,0
+    ;call        apaga_ecra
     lea         dx, Ajuda ; mostra a ajuda
     mov         ah, 9
     INT			21H
-
+	ret
 
 INSTRUCOES ENDP
 
@@ -443,31 +444,33 @@ Main  proc
 	int 21h	
 
 
-OPCJOGAR:		
-
-    cmp 	al, 49
-    jne		OPCSAIR
-    call    JOGAR
+	cmp 	al, 49
+	je		OPCJOGAR
+	cmp		al, 50
+    je		OPCTOP10
+	cmp		al, 51
+    je		OPCINSTRUCOES
+	jmp 	OPCSAIR
 	
+OPCJOGAR:
+	
+	call    JOGAR	
     
 OPCTOP10:
 
-    cmp		al, 50
-    jne		OPCSAIR
     call    TOP10
 	
 	
 OPCINSTRUCOES:
 
-    cmp		al, 51
-    jne		OPCSAIR	
-    ; call	apaga_ecra  ; apaga o ecra
     call    INSTRUCOES ; imprime a ajuda
 	
 OPCSAIR:
   
 	; sai do programa
-    mov  ax, 4c00h
+	call	apaga_ecra  ; apaga o ecra
+	
+	mov  ax, 4c00h
     int  21h
     
     
