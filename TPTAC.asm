@@ -15,12 +15,20 @@
 .stack 2048
 
 ; CODE
-
+CODIGO	SEGMENT	para	public	'code'
 
 
 ; MAIN
 Main    proc
 
-Main    endp
-Cseg	ends
-END     Main
+mov  dx, msg    ; msg > dx
+mov  ah, 9      ; ah = 9 - "print string"
+int  0x21
+
+msg  db 'teste!', 0x0d, 0x0a, '$'
+
+main	endp
+
+    CODIGO ENDS
+		
+END	main
