@@ -21,22 +21,33 @@ dseg	segment para public 'data'
 
         UserInputMenu   dw  ?
 
-        MenuOptions db "ISEC - Trabalho Pratico de TAC",13,10
-                    db "1. Jogar",13,10
-                    db "2. Top 10",13,10
-                    db "3. Sair",13,10,'$'
+        MenuOptions db "                    **************************************",13,10
+					db "                    *                                    *",13,10
+					db "                    *                                    *",13,10
+					db "                    *   ISEC - Trabalho Pratico de TAC   *",13,10
+					db "                    *                                    *",13,10
+					db "                    *                                    *",13,10
+                    db "                    *   1. Jogar                         *",13,10
+                    db "                    *   2. Top 10                        *",13,10
+					db "                    *   3. Ajuda                         *",13,10
+                    db "                    *   4. Sair                          *",13,10
+					db "                    *                                    *",13,10
+					db "                    *                                    *",13,10
+					db "                    **************************************",13,10
+					db "                                                          ",13,10
+					db "                                                          ",13,10,'$'
         
         
 		STR12	 		DB 		"            "	; String para 12 digitos
 		DDMMAAAA 		db		"                     "
 		
-		Horas			dw		0				; Vai guardar a HORA actual
+		Horas			dw		0				; Vai guardar a hora atual
 		Minutos			dw		0				; Vai guardar os minutos actuais
 		Segundos		dw		0				; Vai guardar os segundos actuais
-		Old_seg			dw		0				; Guarda os �ltimos segundos que foram lidos
-		Tempo_init		dw		0				; Guarda O Tempo de inicio do jogo
-		Tempo_j			dw		0				; Guarda O Tempo que decorre o  jogo
-		Tempo_limite	dw		100				; tempo m�ximo de Jogo
+		Old_seg			dw		0				; Guarda os ultimos segundos que foram lidos
+		Tempo_init		dw		0				; Guarda o tempo de inicio do jogo
+		Tempo_j			dw		0				; Guarda o tempo que decorre o jogo
+		Tempo_limite	dw		100				; tempo maximo de Jogo
 		String_TJ		db		"    /100$"
 
 		String_num 		db 		"  0 $"
@@ -62,7 +73,24 @@ dseg	segment para public 'data'
 		POSx			db	3	; POSx pode ir [1..80]	
 		POSya			db	3	; posicao anterior de y
 		POSxa			db	3	; posicao anterior de x
+		
+		
+			
+		; Variáveis da criação de ficheiro
+		fname	db	'top10.txt',0
+		fhandle dw	0
+		buffer	db	'1 5 6 7 8 9 1 5 7 8 9 2 3 7 8 15 16 18 19 20 3',13,10
+				db 	'+ - / * * + - - + * / * + - - + * / + - - + * ',13,10
+				db	'10 12 14 7 9 11 13 5 10 15 7 8 9 10 13 5 10 11',13,10 
+				db 	'/ * + - - + * / + - / * * + - - + * * + - - + ',13,10
+				db	'3 45 23 11 4 7 14 18 31 27 19 9 6 47 19 9 6 51',13,10
+				db	'______________________________________________',13,10
+		msgErrorCreate	db	"Ocorreu um erro na criacao do ficheiro!$"
+		msgErrorWrite	db	"Ocorreu um erro na escrita para ficheiro!$"
+		msgErrorClose	db	"Ocorreu um erro no fecho do ficheiro!$"
+		
 dseg	ends
+
 
 cseg	segment para public 'code'
 assume		cs:cseg, ds:dseg
@@ -184,12 +212,12 @@ AVATAR	PROC
 			mov		ax,0B800h
 			mov		es,ax
 
-			goto_xy	POSx,POSy		; Vai para nova possi��o
-			mov 	ah, 08h         ; Guarda o Caracter que est� na posicao do Cursor
-			mov		bh,0			; numero da p�gina
+			goto_xy	POSx,POSy		; Vai para nova posicao
+			mov 	ah, 08h         ; Guarda o Caracter que esta na posicao do Cursor
+			mov		bh,0			; numero da pagina
 			int		10h			
-			mov		Car, al			; Guarda o Caracter que est� na posicao do Cursor
-			mov		Cor, ah			; Guarda a cor que est� na posicao do Cursor	
+			mov		Car, al			; Guarda o Caracter que esta na posicao do Cursor
+			mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor	
 
         CICLO:		  
 
@@ -198,12 +226,12 @@ AVATAR	PROC
 			mov		dl, Car			; Repoe Caracter guardado 
 			int		21H		
 		
-			goto_xy	POSx,POSy		; Vai para nova possi��o
+			goto_xy	POSx,POSy		; Vai para nova possiao
 			mov 	ah, 08h
-			mov		bh,0			; numero da p�gina
+			mov		bh,0			; numero da pagina
 			int		10h		
-			mov		Car, al			; Guarda o Caracter que est� na posicao do Cursor
-			mov		Cor, ah			; Guarda a cor que est� na posicao do Cursor
+			mov		Car, al			; Guarda o Caracter que esta na posicao do Cursor
+			mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor
 		
 			goto_xy	78,0			; Mostra o caractr que estava na posicao do AVATAR
 			mov		ah, 02h			; IMPRIME caracter da posicao no canto
@@ -323,6 +351,9 @@ TOP10	PROC
         
 TOP10	endp
 
+
+;########################################################################
+
 ; PROC. JOGO
 
 JOGAR   PROC
@@ -345,6 +376,21 @@ JOGAR   PROC
 JOGAR ENDP
 
 
+;########################################################################
+
+; PROC. INSTRUCOES
+
+INSTRUCOES   PROC
+
+	call		apaga_ecra  ; apaga o ecra
+		
+	mov			ah,4CH
+    INT			21H
+
+
+INSTRUCOES ENDP
+
+
 ; 177 = ASCII CODE DAS BORDAS DO LABIRINTO
 
 ; MOSTRA O MENU
@@ -355,6 +401,7 @@ MostraMenu proc
   int  21h
   ret
 MostraMenu endp
+
 
 
 ; MAIN
@@ -372,26 +419,33 @@ Main  proc
     
     call        MostraMenu ; imprime o menu no ecra
 
-    mov         ah, 7
-    int         21h
-    cmp         ah, 7
-    je          OPCJOGAR
+	mov ah, 1h
+	int 21h	
+
 
 OPCJOGAR:		
 
-    cmp 	al, 31
-    jne		OPCTOP10
+    cmp 	al, 49
+    jne		OPCSAIR
     call    JOGAR
+	
     
 OPCTOP10:
 
-    cmp		al, 32
+    cmp		al, 50
     jne		OPCSAIR
     call    TOP10
+	
+	
+OPCINSTRUCOES:
 
+    cmp		al, 51
+    jne		OPCSAIR
+    call    INSTRUCOES
+	
 OPCSAIR:
-    ; sair
-    
+  
+	; sai do programa
     mov  ax, 4c00h
     int  21h
     
