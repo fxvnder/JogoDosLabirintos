@@ -25,6 +25,11 @@
 
 ; ---------------------------------------------------------
 
+PILHA	SEGMENT PARA STACK 'STACK'
+		db 2048 dup(?)
+PILHA	ENDS
+
+
 dseg	segment para public 'data' ; segmento de codigo "D"
 
         UserInputMenu   dw  ?
@@ -73,10 +78,12 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		; VARIAVEIS ETC.
         
 		STR12	 		DB 		"            "	; String para 12 digitos
+		STR10			DB		"          "
 		DDMMAAAA 		db		"                     "
 		
 		; CONTADOR
 
+		timer			dw 		0 				; Contador de tempo
 		Horas			dw		0				; Vai guardar a hora atual
 		Minutos			dw		0				; Vai guardar os minutos actuais
 		Segundos		dw		0				; Vai guardar os segundos actuais
@@ -117,8 +124,8 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		string			db	"Teste pratico de T.I",0
 		Car				db	32	; Guarda um caracter do Ecra
 		Cor				db	7	; Guarda os atributos de cor do caracter
-		POSy			db	3	; a linha pode ir de [1 .. 25]
-		POSx			db	3	; POSx pode ir [1..80]	
+		POSy			db  10	; a linha pode ir de [1 .. 25]
+		POSx			db	40	; POSx pode ir [1..80]	
 		POSya			db	3	; posicao anterior de y
 		POSxa			db	3	; posicao anterior de x
 			
@@ -136,11 +143,17 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		msgErrorWrite	db	"Ocorreu um erro na escrita para ficheiro!$"
 		msgErrorClose	db	"Ocorreu um erro no fecho do ficheiro!$"
 		
+		
+		; Horas
+		NUM_SP		db		"                    $" 	; PAra apagar zona de ecran
+		
+		
 dseg	ends ; fim do segmento "D"
+
 
 cseg	segment para public 'code' ; segmento "C" comeca
 
-assume		cs:cseg, ds:dseg
+assume		cs:cseg, ds:dseg, ss:pilha
 
 ; macro para manusear posicoes no ecra "X,Y"
 
@@ -397,29 +410,29 @@ IMP_FICH3	endp
 ; ---------------------------------------------------------
 ; ---------------------------------------------------------
 
-PALAVRA_A_COMPLETAR1 PROC
+PALAVRA_A_COMPLETAR1	PROC
 	; Palavra a procurar
 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 1
 	mov     ah, 09h
 	lea     dx, String_Fich1
 	int		21H	
-PALAVRA_A_COMPLETAR1 ENDP
+PALAVRA_A_COMPLETAR1	ENDP
 
-PALAVRA_A_COMPLETAR2 PROC
+PALAVRA_A_COMPLETAR2	PROC
 	; Palavra a procurar
 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
 	mov     ah, 09h
 	lea     dx, String_Fich1
 	int		21H	
-PALAVRA_A_COMPLETAR2 ENDP
+PALAVRA_A_COMPLETAR2	ENDP
 
-PALAVRA_A_COMPLETAR3 PROC
+PALAVRA_A_COMPLETAR3	PROC
 	; Palavra a procurar
 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
 	mov     ah, 09h
 	lea     dx, String_Fich1
 	int		21H	
-PALAVRA_A_COMPLETAR3 ENDP
+PALAVRA_A_COMPLETAR3	ENDP
 
 ; ---------------------------------------------------------
 
@@ -514,7 +527,7 @@ AVATAR	PROC
 
 			RET
 
-AVATAR		endp
+AVATAR	endp
 
 
 
@@ -578,16 +591,18 @@ TOP10	endp
 
 ; -------------------------------------------
 
-JOGAR   PROC
+JOGAR	PROC
 
 	call		apaga_ecra  ; apaga o ecra
 
 	goto_xy		0,0         ; x = 0; y = 0 - vai para o inicio
 
     call		IMP_FICH1    ; procedimento que imprime o conteudo do ficheiro
+
+	call 		Trata_Horas
 	
 	call		PALAVRA_A_COMPLETAR1
-
+	
 	call 		AVATAR      ; procedimento do avatar
 
     goto_xy		0,22        ; x = 0; y = 22
@@ -596,7 +611,7 @@ JOGAR   PROC
     
 	INT			21H
 
-JOGAR ENDP
+JOGAR	ENDP
 
 
 ; -------------------------------------------
@@ -606,7 +621,7 @@ JOGAR ENDP
 ; -------------------------------------------
 
 
-NIVEL2   PROC
+NIVEL2	PROC
 
 	call		apaga_ecra  ; apaga o ecra
 
@@ -624,7 +639,7 @@ NIVEL2   PROC
 	
     INT			21H
 
-NIVEL2 ENDP
+NIVEL2	ENDP
 
 
 ; -------------------------------------------
@@ -634,7 +649,7 @@ NIVEL2 ENDP
 ; -------------------------------------------
 
 
-NIVEL3   PROC
+NIVEL3	PROC
 
 	call		apaga_ecra  ; apaga o ecra
 
@@ -674,8 +689,130 @@ INSTRUCOES	PROC
 INSTRUCOES	ENDP
 
 
+
+;********************************************************************************
+;********************************************************************************
+; HORAS  - LE Hora DO SISTEMA E COLOCA em tres variaveis (Horas, Minutos, Segundos)
+; CH - Horas, CL - Minutos, DH - Segundos
+;********************************************************************************	
+
+Ler_TEMPO PROC	
+ 
+		PUSH AX
+		PUSH BX
+		PUSH CX
+		PUSH DX
+	
+		PUSHF
+		
+		MOV AH, 2CH             ; Buscar a hORAS
+		INT 21H                 
+		
+		XOR AX,AX
+		MOV AL, DH              ; segundos para al
+		mov Segundos, AX		; guarda segundos na variavel correspondente
+		
+		XOR AX,AX
+		MOV AL, CL              ; Minutos para al
+		mov Minutos, AX         ; guarda MINUTOS na variavel correspondente
+		
+		XOR AX,AX
+		MOV AL, CH              ; Horas para al
+		mov Horas,AX			; guarda HORAS na variavel correspondente
+ 
+		POPF
+		POP DX
+		POP CX
+		POP BX
+		POP AX
+ 		RET 
+Ler_TEMPO   ENDP 
+
+;********************************************************************************
+;********************************************************************************
+; Imprime o tempo no monitor
+
+Trata_Horas PROC
+
+		PUSHF
+		PUSH AX
+		PUSH BX
+		PUSH CX
+		PUSH DX		
+
+		CALL 	Ler_TEMPO			; Horas, minutos e segundos do Sistema
+		
+		MOV		AX, Segundos
+		cmp		AX, Old_seg			; Verifica se os segundos mudaram desde a ultima leitura
+		je		fim_horas			; Se a hora não mudou desde a última leitura sai
+		mov		Old_seg, AX			; Se segundos são diferentes actualiza informação do tempo 
+		
+		
+		mov 	ax, timer
+		inc		ax
+		MOV 	STR10[0],al			; 
+		MOV 	STR10[1],ah
+		MOV 	STR10[2],'$'
+		GOTO_XY	14,0
+		MOSTRA	STR10 
+		
+		mov 	ax,Horas
+		MOV		bl, 10     
+		div 	bl
+		add 	al, 30h				; Caracter Correspondente às dezenas
+		add		ah,	30h				; Caracter Correspondente às unidades
+		
+		
+		MOV 	STR12[0],al			; 
+		MOV 	STR12[1],ah
+		MOV 	STR12[2],'h'		
+		MOV 	STR12[3],'$'
+		GOTO_XY 1,0
+		MOSTRA STR12 		
+        
+		mov 	ax,Minutos
+		MOV 	bl, 10     
+		div 	bl
+		add 	al, 30h				; Caracter Correspondente às dezenas
+		add		ah,	30h				; Caracter Correspondente às unidades
+		MOV 	STR12[0],al			; 
+		MOV 	STR12[1],ah
+		MOV 	STR12[2],'m'		
+		MOV 	STR12[3],'$'
+		GOTO_XY	5,0
+		MOSTRA	STR12 		
+		
+		mov 	ax,Segundos
+		MOV 	bl, 10     
+		div 	bl
+		add 	al, 30h				; Caracter Correspondente às dezenas
+		add		ah,	30h				; Caracter Correspondente às unidades
+		MOV 	STR12[0],al			; 
+		MOV 	STR12[1],ah
+		MOV 	STR12[2],'s'		
+		MOV 	STR12[3],'$'
+		GOTO_XY 9,0 
+		MOSTRA	STR12 		
+        
+		
+		
+						
+fim_horas:		
+		goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
+		
+		POPF
+		POP DX		
+		POP CX
+		POP BX
+		POP AX
+		RET		
+			
+Trata_Horas ENDP
+
+
+
 ; IMPRIME O MENU INICIAL
-MostraMenu proc
+MostraMenu	proc
 
 	goto_xy   0,0
 	lea  dx,  MenuOptions
@@ -683,11 +820,11 @@ MostraMenu proc
 	int  21h
 	ret
 	
-MostraMenu endp
+MostraMenu	endp
 
 
 ; TRATA DO MENU DO PROGRAMA
-MenuInicial proc
+MenuInicial	proc
 
 	call		apaga_ecra  ; apaga o ecra
 
@@ -707,6 +844,7 @@ MenuInicial proc
 	je		OPCSAIR
 	jmp     OPCSAIR ; jump -> sair
 	
+	
 OPCJOGAR:
 	
 	call    JOGAR	
@@ -724,7 +862,7 @@ OPCSAIR:
 	mov  ax, 4c00h
     int  21h
 
-MenuInicial endp
+MenuInicial	endp
 
 ; -------------------------------------------
 
@@ -732,7 +870,7 @@ MenuInicial endp
 
 ; -------------------------------------------
 
-Main  proc
+Main	proc
 
 	mov			ax, dseg
 	mov			ds,ax
@@ -746,11 +884,11 @@ Main  proc
     
 	call		MenuInicial		; trata do programa
 
-Main    endp ; fim do main
+Main	endp 					; fim do main
 
-Cseg	ends ; fim do segmento de codigo
+Cseg	ends 					; fim do segmento de codigo
 
-end	Main ; fim do programa
+end		Main 					; fim do programa
 
 
 
