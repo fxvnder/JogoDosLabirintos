@@ -35,7 +35,6 @@ dseg	segment para public 'data' ; segmento de codigo "D"
         UserInputMenu   dw  ?
 
 		; MENU INICIAL
-
         MenuOptions db "                                                          ",13,10
 					db "                    **************************************",13,10
 					db "                    *                                    *",13,10
@@ -83,7 +82,7 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		
 		; CONTADOR
 
-		timer			dw 		0 				; Contador de tempo
+		timer			dw 		'0' 				; Contador de tempo
 		Horas			dw		0				; Vai guardar a hora atual
 		Minutos			dw		0				; Vai guardar os minutos actuais
 		Segundos		dw		0				; Vai guardar os segundos actuais
@@ -181,6 +180,7 @@ ENDM
 
 LE_TECLA	PROC
 		
+		call 	Trata_Horas
 		mov		ah,08h
 		int		21h
 		mov		ah,0
@@ -454,12 +454,14 @@ AVATAR	PROC
 
         CICLO:		  
 
+			;call Trata_Horas
+			
             goto_xy	POSxa,POSya		; Vai para a posicao anterior do cursor
 			mov		ah, 02h
 			mov		dl, Car			; Repoe Caracter guardado 
 			int		21H		
 		
-			goto_xy	POSx,POSy		; Vai para nova possiao
+			goto_xy	POSx,POSy		; Vai para nova posicao
 			mov 	ah, 08h
 			mov		bh,0			; numero da pagina
 			int		10h		
@@ -726,12 +728,11 @@ Ler_TEMPO PROC
 		POP BX
 		POP AX
  		RET 
+		
 Ler_TEMPO   ENDP 
 
-;********************************************************************************
-;********************************************************************************
-; Imprime o tempo no monitor
 
+;--------------------------------
 Trata_Horas PROC
 
 		PUSHF
@@ -740,36 +741,44 @@ Trata_Horas PROC
 		PUSH CX
 		PUSH DX		
 
-		CALL 	Ler_TEMPO			; Horas, minutos e segundos do Sistema
+		CALL 	Ler_TEMPO			; Horas MINUTOS e segundos do Sistema
 		
 		MOV		AX, Segundos
 		cmp		AX, Old_seg			; Verifica se os segundos mudaram desde a ultima leitura
-		je		fim_horas			; Se a hora não mudou desde a última leitura sai
+		je		fim_horas			; Se a hora não mudou desde a última leitura sai.
 		mov		Old_seg, AX			; Se segundos são diferentes actualiza informação do tempo 
 		
+	
 		
-		mov 	ax, timer
-		inc		ax
-		MOV 	STR10[0],al			; 
-		MOV 	STR10[1],ah
+		mov		dx, timer
+		
+		;cmp    dx, '8'
+		;je		fim
+		
+		add		dx, 1
+	    mov		timer, dx
+	
+		MOV 	STR10[0],dl			;
+		MOV 	STR10[1],dh
 		MOV 	STR10[2],'$'
-		GOTO_XY	14,0
-		MOSTRA	STR10 
+		GOTO_XY 58,0
+		MOSTRA STR10 	
+		
 		
 		mov 	ax,Horas
 		MOV		bl, 10     
 		div 	bl
 		add 	al, 30h				; Caracter Correspondente às dezenas
 		add		ah,	30h				; Caracter Correspondente às unidades
-		
-		
+	
 		MOV 	STR12[0],al			; 
 		MOV 	STR12[1],ah
-		MOV 	STR12[2],'h'		
+		MOV 	STR12[2],'h'
 		MOV 	STR12[3],'$'
 		GOTO_XY 1,0
-		MOSTRA STR12 		
-        
+		MOSTRA STR12 	
+
+
 		mov 	ax,Minutos
 		MOV 	bl, 10     
 		div 	bl
@@ -782,6 +791,7 @@ Trata_Horas PROC
 		GOTO_XY	5,0
 		MOSTRA	STR12 		
 		
+		
 		mov 	ax,Segundos
 		MOV 	bl, 10     
 		div 	bl
@@ -791,11 +801,20 @@ Trata_Horas PROC
 		MOV 	STR12[1],ah
 		MOV 	STR12[2],'s'		
 		MOV 	STR12[3],'$'
-		GOTO_XY 9,0 
+		GOTO_XY	9,0
 		MOSTRA	STR12 		
         
 		
+		fim:
 		
+		POPF
+		POP DX		
+		POP CX
+		POP BX
+		POP AX
+		RET		
+		MOV			AH,4Ch
+		INT			21h
 						
 fim_horas:		
 		goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
@@ -810,6 +829,9 @@ fim_horas:
 Trata_Horas ENDP
 
 
+
+
+;--------------------------------------------------------------------------
 
 ; IMPRIME O MENU INICIAL
 MostraMenu	proc
