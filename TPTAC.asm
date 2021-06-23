@@ -36,6 +36,25 @@ dseg	segment para public 'data'
 					db "                    **************************************",13,10
 					db "                                                          ",13,10
 					db "                                                          ",13,10,'$'
+					
+        Ajuda       db "                    **************************************",13,10
+					db "                    *                                    *",13,10
+					db "                    *   Ajuda                            *",13,10
+					db "                    *                                    *",13,10
+					db "                    *   Neste jogo seras colocado num    *",13,10
+					db "                    *  labirinto. No labirinto, teras de *",13,10
+                    db "                    *  guiar o teu avatar para encontrar *",13,10
+                    db "                    *  as letras da palavra pedida.      *",13,10
+					db "                    *   A medida que o fizeres, vais     *",13,10
+                    db "                    *  passar de nivel, e seras pontuado *",13,10
+					db "                    *  com base no tempo em que          *",13,10
+					db "                    *  demoraste a completar os niveis.  *",13,10
+                    db "                    *                                    *",13,10
+                    db "                    *   Boa sorte!                       *",13,10
+					db "                    *                                    *",13,10
+					db "                    **************************************",13,10
+					db "                                                          ",13,10
+					db "                                                          ",13,10,'$'
         
         
 		STR12	 		DB 		"            "	; String para 12 digitos
@@ -382,9 +401,9 @@ JOGAR ENDP
 
 INSTRUCOES   PROC
 
-	call		apaga_ecra  ; apaga o ecra
-		
-	mov			ah,4CH
+    call        apaga_ecra
+    lea         dx, Ajuda ; mostra a ajuda
+    mov         ah, 9
     INT			21H
 
 
@@ -396,8 +415,9 @@ INSTRUCOES ENDP
 ; MOSTRA O MENU
 
 MostraMenu proc
-  lea  dx, MenuOptions
-  mov  ah, 9
+  goto_xy   0,0
+  lea  dx,  MenuOptions
+  mov  ah,  9
   int  21h
   ret
 MostraMenu endp
@@ -440,8 +460,9 @@ OPCTOP10:
 OPCINSTRUCOES:
 
     cmp		al, 51
-    jne		OPCSAIR
-    call    INSTRUCOES
+    jne		OPCSAIR	
+    ; call	apaga_ecra  ; apaga o ecra
+    call    INSTRUCOES ; imprime a ajuda
 	
 OPCSAIR:
   
