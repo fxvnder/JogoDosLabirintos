@@ -149,15 +149,10 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		
 dseg	ends ; fim do segmento "D"
 
-; ---------------------------------------------------------
 
 cseg	segment para public 'code' ; segmento "C" comeca
 
 assume		cs:cseg, ds:dseg, ss:pilha
-
-; ------------------------------------------------------------------
-
-; MACROS
 
 ; macro para manusear posicoes no ecra "X,Y"
 
@@ -180,8 +175,6 @@ MOSTRA MACRO STR
 	INT 21H
 
 ENDM
-
-; ------------------------------------------------------------------
 
 ; PROCEDIMENTO PARA LER UMA TECLA	
 
@@ -306,53 +299,53 @@ IMP_FICH2	PROC
 		; FICHEIRO = LABIRINTO 2
         lea     dx,Fich2
         int     21h
-        jc      erro_abrir2
+        jc      erro_abrir
         mov     HandleFich,ax
-        jmp     ler_ciclo2
+        jmp     ler_ciclo
 
-erro_abrir2:
+erro_abrir:
         mov     ah,09h
         lea     dx,Erro_Open
         int     21h
-        jmp     sai_f2
+        jmp     sai_f
 
-ler_ciclo2:
+ler_ciclo:
         mov     ah,3fh
         mov     bx,HandleFich
         mov     cx,1
         lea     dx,car_fich
         int     21h
-		jc		erro_ler2
+		jc		erro_ler
 		cmp		ax,0		;EOF?
-		je		fecha_ficheiro2
+		je		fecha_ficheiro
         mov     ah,02h
 		mov		dl,car_fich
 		int		21h
-		jmp		ler_ciclo2
+		jmp		ler_ciclo
 
-erro_ler2:
+erro_ler:
         mov     ah,09h
         lea     dx,Erro_Ler_Msg
         int     21h
 
-fecha_ficheiro2:
+fecha_ficheiro:
         mov     ah,3eh
         mov     bx,HandleFich
         int     21h
-        jnc     sai_f2
+        jnc     sai_f
 
         mov     ah,09h
         lea     dx,Erro_Close
         Int     21h
 
-imprime_palavra2:				;por concluir
+imprime_palavra:				;por concluir
 		goto_xy 22,11
 		mov     ah,09h
         lea     dx,String_Fich2
         int     21h
-        jnc     sai_f2
+        jnc     sai_f
 
-sai_f2:	
+sai_f:	
 		RET
 		
 IMP_FICH2	endp		
@@ -369,60 +362,60 @@ IMP_FICH3	PROC
 		; FICHEIRO = LABIRINTO 3
         lea     dx,Fich3
         int     21h
-        jc      erro_abrir3
+        jc      erro_abrir
         mov     HandleFich,ax
-        jmp     ler_ciclo3
+        jmp     ler_ciclo
 
-erro_abrir3:
+erro_abrir:
         mov     ah,09h
         lea     dx,Erro_Open
         int     21h
-        jmp     sai_f3
+        jmp     sai_f
 
-ler_ciclo3:
+ler_ciclo:
         mov     ah,3fh
         mov     bx,HandleFich
         mov     cx,1
         lea     dx,car_fich
         int     21h
-		jc		erro_ler3
+		jc		erro_ler
 		cmp		ax,0		;EOF?
-		je		fecha_ficheiro3
+		je		fecha_ficheiro
         mov     ah,02h
 		mov		dl,car_fich
 		int		21h
-		jmp		ler_ciclo3
+		jmp		ler_ciclo
 
-erro_ler3:
+erro_ler:
         mov     ah,09h
         lea     dx,Erro_Ler_Msg
         int     21h
 
-fecha_ficheiro3:
+fecha_ficheiro:
         mov     ah,3eh
         mov     bx,HandleFich
         int     21h
-        jnc     sai_f3
+        jnc     sai_f
 
         mov     ah,09h
         lea     dx,Erro_Close
         Int     21h
 
-imprime_palavra3:				;por concluir
+imprime_palavra:				;por concluir
 		goto_xy 22,11
 		mov     ah,09h
         lea     dx,String_Fich3
         int     21h
-        jnc     sai_f3
+        jnc     sai_f
 
-sai_f3:	
+sai_f:	
 		RET
 		
 IMP_FICH3	endp		
 
-; ------------------------------------------------------------------
-; ------------------------------------------------------------------
-; ------------------------------------------------------------------
+; ---------------------------------------------------------
+; ---------------------------------------------------------
+; ---------------------------------------------------------
 
 PALAVRA_A_COMPLETAR1	PROC
 	; Palavra a procurar
@@ -436,7 +429,7 @@ PALAVRA_A_COMPLETAR2	PROC
 	; Palavra a procurar
 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 2
 	mov     ah, 09h
-	lea     dx, String_Fich2
+	lea     dx, String_Fich1
 	int		21H	
 PALAVRA_A_COMPLETAR2	ENDP
 
@@ -444,18 +437,21 @@ PALAVRA_A_COMPLETAR3	PROC
 	; Palavra a procurar
 	goto_xy	10,21			; Mostra a palavra que o utilizador deve completar no labirinto 3
 	mov     ah, 09h
-	lea     dx, String_Fich3
+	lea     dx, String_Fich1
 	int		21H	
 PALAVRA_A_COMPLETAR3	ENDP
 
 
+; ---------------------------------------------------------
+
 TEMPO_TIMER	PROC
-	; Palavra a procurar
-	goto_xy	57,0			; Mostra a palavra que o utilizador deve completar no labirinto 3
+	; Mostra qt tempo / 100
+	goto_xy	57,0			
 	mov     ah, 09h
 	lea     dx, String_TJ
 	int		21H	
 TEMPO_TIMER	ENDP
+
 
 
 ; ---------------------------------------------------------
@@ -463,7 +459,6 @@ TEMPO_TIMER	ENDP
 ; PROCEDIMENTO QUE GERE O AVATAR
 
 ; ---------------------------------------------------------
-
 
 AVATAR	PROC
 
@@ -529,7 +524,7 @@ AVATAR	PROC
 			cmp		ah, 1
 			je		ESTEND
 			CMP 	AL, 27	; ESC
-			JE		FIMAVA
+			JE		FIM
 			jmp		LER_SETA
 		
         ESTEND:		
@@ -560,11 +555,13 @@ AVATAR	PROC
 			inc		POSx		; direita
 			jmp		CICLO
 
-        FIMAVA:		
+        fim:		
 
 			RET
 
 AVATAR	endp
+
+
 
 ; -------------------------------------------
 
@@ -587,7 +584,7 @@ TOP10	PROC
 		lea		dx, msgErrorCreate
 		int		21h
 	
-		jmp		fimtop10
+		jmp		fim
 
     escreve:
 
@@ -607,13 +604,13 @@ TOP10	PROC
 
 		mov		ah,3eh				; fecha o ficheiro
 		int		21h
-		jnc		fimtop10
+		jnc		fim
 	
 		mov		ah, 09h
 		lea		dx, msgErrorClose
 		int		21h
 
-    fimtop10:
+    fim:
 
 		MOV		AH,4CH
 		INT		21H
@@ -708,11 +705,12 @@ NIVEL3	PROC
 
 NIVEL3 ENDP
 
-; ------------------------------------------------------------------
+
+; -------------------------------------------
 
 ; PROC. INSTRUCOES
 
-; ------------------------------------------------------------------
+; -------------------------------------------
 
 
 INSTRUCOES	PROC
@@ -726,12 +724,14 @@ INSTRUCOES	PROC
 
 INSTRUCOES	ENDP
 
-; ------------------------------------------------------------------
-; ------------------------------------------------------------------
+
+
+; ----------------------------------------------------------------------------------
+; ----------------------------------------------------------------------------------
 ; HORAS - Le Hora DO SISTEMA E COLOCA em tres variaveis (Horas, Minutos, Segundos)
 ; CH - Horas, CL - Minutos, DH - Segundos
-; ------------------------------------------------------------------
-; ------------------------------------------------------------------
+; ----------------------------------------------------------------------------------
+; ----------------------------------------------------------------------------------
 
 Ler_TEMPO PROC	
  
@@ -767,6 +767,7 @@ Ler_TEMPO PROC
 Ler_TEMPO   ENDP 
 
 
+;--------------------------------
 Trata_Horas PROC
 
 		PUSHF
@@ -785,17 +786,17 @@ Trata_Horas PROC
 		
 		mov		dx, timer
 		
-		;cmp     dx, '100'
-		je		fimhoras
+		cmp     dx, '100'
+		je		fim_se_for_igual
 		
 		add		dx, 1
 	    mov		timer, dx
 	
 
 		mov		ax, timer
-		;MOV		bl, 10     
+		;MOV	    bl, 10     
 		;div 	bl
-		;add 	al, 30h				; Caracter Correspondente às dezenas
+		;add 	al, 30h				
 		;add		ah,	30h
 		
 		MOV 	STR10[0],al			
@@ -844,9 +845,8 @@ Trata_Horas PROC
 		GOTO_XY	9,0
 		MOSTRA	STR12 		
         
-	; a testar os fins	
-
-	fimhoras:
+		
+	fim_se_for_igual:
 		
 		POPF
 		POP DX		
@@ -869,10 +869,12 @@ Trata_Horas PROC
 			
 Trata_Horas ENDP
 
-; ------------------------------------------------------------------
+
+
+
+;--------------------------------------------------------------------------
 
 ; IMPRIME O MENU INICIAL
-
 MostraMenu	proc
 
 	goto_xy   0,0
@@ -885,7 +887,6 @@ MostraMenu	endp
 
 
 ; TRATA DO MENU DO PROGRAMA
-
 MenuInicial	proc
 
 	call		apaga_ecra  ; apaga o ecra
@@ -896,7 +897,6 @@ MenuInicial	proc
 	int 21h	
 
 	; chama o procedimento conforme a tecla pressionada
-	
 	cmp 	al, 49 ; 1
 	je		OPCJOGAR
 	cmp		al, 50 ; 2
@@ -927,15 +927,11 @@ OPCSAIR:
 
 MenuInicial	endp
 
+; -------------------------------------------
 
+; ------------------ MAIN -------------------
 
-; ------------------------------------------------------------------
-
-; ---------------------------- MAIN --------------------------------
-
-; ------------------------------------------------------------------
-
-
+; -------------------------------------------
 
 Main	proc
 
