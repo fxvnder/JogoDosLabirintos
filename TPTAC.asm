@@ -90,7 +90,7 @@ dseg	segment para public 'data' ; segmento de codigo "D"
 		Tempo_init		dw		0				; Guarda o tempo de inicio do jogo
 		Tempo_j			dw		0				; Guarda o tempo que decorre o jogo
 		Tempo_limite	dw		100				; tempo maximo de Jogo
-		String_TJ		db		"    /100$"
+		String_TJ		db		"     / 100$"
 
 		; PALAVRAS
 
@@ -179,18 +179,25 @@ ENDM
 ; PROCEDIMENTO PARA LER UMA TECLA	
 
 LE_TECLA	PROC
+sem_tecla:
+		call Trata_Horas
+		MOV	AH,0BH
+		INT 21h
+		cmp AL,0
+		je	sem_tecla
 		
-		call 	Trata_Horas
-		mov		ah,08h
-		int		21h
-		mov		ah,0
-		cmp		al,0
-		jne		SAI_TECLA
-		mov		ah, 08h
-		int		21h
-		mov		ah,1
-SAI_TECLA:	RET
-LE_TECLA	endp
+		
+		MOV	AH,08H
+		INT	21H
+		MOV	AH,0
+		CMP	AL,0
+		JNE	SAI_TECLA
+		MOV	AH, 08H
+		INT	21H
+		MOV	AH,1
+SAI_TECLA:	
+		RET
+LE_TECLA	ENDP
 
 
 ; PROCEDIMENTO PARA APAGAR ECRA
@@ -434,6 +441,17 @@ PALAVRA_A_COMPLETAR3	PROC
 	int		21H	
 PALAVRA_A_COMPLETAR3	ENDP
 
+
+TEMPO_TIMER	PROC
+	; Palavra a procurar
+	goto_xy	57,0			; Mostra a palavra que o utilizador deve completar no labirinto 3
+	mov     ah, 09h
+	lea     dx, String_TJ
+	int		21H	
+TEMPO_TIMER	ENDP
+
+
+
 ; ---------------------------------------------------------
 
 ; PROCEDIMENTO QUE GERE O AVATAR
@@ -450,11 +468,13 @@ AVATAR	PROC
 			mov		bh,0			; numero da pagina
 			int		10h			
 			mov		Car, al			; Guarda o Caracter que esta na posicao do Cursor
-			mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor	
-
-        CICLO:		  
-
-			;call Trata_Horas
+			mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor					
+			
+			;cmp 	Car, 177
+			;je		REINICIAR
+			
+			
+		CICLO:		  
 			
             goto_xy	POSxa,POSya		; Vai para a posicao anterior do cursor
 			mov		ah, 02h
@@ -467,7 +487,7 @@ AVATAR	PROC
 			int		10h		
 			mov		Car, al			; Guarda o Caracter que esta na posicao do Cursor
 			mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor
-		
+			
 			; Imprime caracter onde o avatar se encontra
 			goto_xy	78,0			; Mostra o caracter que estava na posicao do AVATAR
 			mov		ah, 02h			; IMPRIME caracter da posicao no canto
@@ -475,7 +495,15 @@ AVATAR	PROC
 			int		21H			
 	
 			goto_xy	POSx,POSy		; Vai para posicao do cursor
+		
 
+		;REINICIAR:
+		;	goto_xy	POSxa,POSya	
+		;	mov		ah, 02h
+		;	mov		dl, Car			; Repoe Caracter guardado 
+		;	int		21H		
+			
+			
         IMPRIME:	
 
             mov		ah, 02h
@@ -601,12 +629,12 @@ JOGAR	PROC
 
     call		IMP_FICH1    ; procedimento que imprime o conteudo do ficheiro
 
-	call 		Trata_Horas
-	
 	call		PALAVRA_A_COMPLETAR1
 	
+	call		TEMPO_TIMER
+	
 	call 		AVATAR      ; procedimento do avatar
-
+	
     goto_xy		0,22        ; x = 0; y = 22
 	
 	mov			ah,4CH 		; FIM DO PROGRAMA
@@ -633,6 +661,8 @@ NIVEL2	PROC
 	
 	call		PALAVRA_A_COMPLETAR2
 
+	call		TEMPO_TIMER
+	
 	call 		AVATAR      ; procedimento do avatar
 
     goto_xy		0,22        ; x = 0; y = 22
@@ -661,6 +691,8 @@ NIVEL3	PROC
 	
 	call		PALAVRA_A_COMPLETAR3
 
+	call		TEMPO_TIMER
+	
 	call 		AVATAR      ; procedimento do avatar
 
     goto_xy		0,22        ; x = 0; y = 22
@@ -692,11 +724,11 @@ INSTRUCOES	ENDP
 
 
 
-;********************************************************************************
-;********************************************************************************
-; HORAS  - LE Hora DO SISTEMA E COLOCA em tres variaveis (Horas, Minutos, Segundos)
+;***********************************************************************************
+;***********************************************************************************
+; HORAS  - Le Hora DO SISTEMA E COLOCA em tres variaveis (Horas, Minutos, Segundos)
 ; CH - Horas, CL - Minutos, DH - Segundos
-;********************************************************************************	
+;***********************************************************************************	
 
 Ler_TEMPO PROC	
  
@@ -741,27 +773,33 @@ Trata_Horas PROC
 		PUSH CX
 		PUSH DX		
 
-		CALL 	Ler_TEMPO			; Horas MINUTOS e segundos do Sistema
+		call 	Ler_TEMPO			; Horas, minutos e segundos do Sistema
 		
 		MOV		AX, Segundos
 		cmp		AX, Old_seg			; Verifica se os segundos mudaram desde a ultima leitura
 		je		fim_horas			; Se a hora não mudou desde a última leitura sai.
 		mov		Old_seg, AX			; Se segundos são diferentes actualiza informação do tempo 
 		
-	
 		
 		mov		dx, timer
 		
-		;cmp    dx, '8'
-		;je		fim
+		cmp     dx, '100'
+		je		fim
 		
 		add		dx, 1
 	    mov		timer, dx
 	
-		MOV 	STR10[0],dl			;
-		MOV 	STR10[1],dh
+
+		mov		ax, timer
+		;MOV		bl, 10     
+		;div 	bl
+		;add 	al, 30h				; Caracter Correspondente às dezenas
+		;add		ah,	30h
+		
+		MOV 	STR10[0],al			
+		MOV 	STR10[1],ah
 		MOV 	STR10[2],'$'
-		GOTO_XY 58,0
+		GOTO_XY 59,0
 		MOSTRA STR10 	
 		
 		
@@ -771,7 +809,7 @@ Trata_Horas PROC
 		add 	al, 30h				; Caracter Correspondente às dezenas
 		add		ah,	30h				; Caracter Correspondente às unidades
 	
-		MOV 	STR12[0],al			; 
+		MOV 	STR12[0],al			
 		MOV 	STR12[1],ah
 		MOV 	STR12[2],'h'
 		MOV 	STR12[3],'$'
@@ -784,7 +822,7 @@ Trata_Horas PROC
 		div 	bl
 		add 	al, 30h				; Caracter Correspondente às dezenas
 		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			; 
+		MOV 	STR12[0],al			 
 		MOV 	STR12[1],ah
 		MOV 	STR12[2],'m'		
 		MOV 	STR12[3],'$'
@@ -797,7 +835,7 @@ Trata_Horas PROC
 		div 	bl
 		add 	al, 30h				; Caracter Correspondente às dezenas
 		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			; 
+		MOV 	STR12[0],al			 
 		MOV 	STR12[1],ah
 		MOV 	STR12[2],'s'		
 		MOV 	STR12[3],'$'
@@ -805,7 +843,7 @@ Trata_Horas PROC
 		MOSTRA	STR12 		
         
 		
-		fim:
+	fim:
 		
 		POPF
 		POP DX		
@@ -816,7 +854,7 @@ Trata_Horas PROC
 		MOV			AH,4Ch
 		INT			21h
 						
-fim_horas:		
+	fim_horas:		
 		goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
 		
 		POPF
@@ -929,15 +967,15 @@ end		Main 					; fim do programa
 
 
 
-	; ----------------------------
+	; -------------------------------
 	
 	; CODIGO/APONTAMENTOS DE TESTES.
 
-	; ----------------------------
+	; -------------------------------
 
 	; !!! 177 = ASCII CODE DAS BORDAS DO LABIRINTO !!!
 
-	; ----------------------------
+	; -------------------------------
 
 	; procedimento que servia para resumir o main
 
